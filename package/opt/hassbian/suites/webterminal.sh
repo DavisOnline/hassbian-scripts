@@ -1,43 +1,44 @@
 #!/bin/bash
 function webterminal-show-short-info {
-  echo "Installs an websevice terminal."
+  echo "安装网页终端"
 }
 
 function webterminal-show-long-info {
-  echo "Installs an websevice terminal to control your installation."
+  echo "安装网页终端"
 }
 
 function webterminal-show-copyright-info {
-	echo "Original concept by Ludeeus <https://github.com/ludeeus>"
+	echo "原创：Ludeeus <https://github.com/ludeeus>"
+  echo "本地化：墨澜 <http://cxlwill.cn>"
 }
 
 function webterminal-install-package {
-echo "Installing packages."
+echo "安装软件"
 sudo apt-get install -y openssl shellinabox
 
-echo "Changing config."
+echo "更改配置"
 sudo sed -i 's/--no-beep/--no-beep --disable-ssl/g' /etc/default/shellinabox
 
-echo "Reloading and starting the service."
+echo "启动服务"
 sudo service shellinabox reload
 sudo service shellinabox restart
 
 ip_address=$(ifconfig | grep "inet.*broadcast" | grep -v 0.0.0.0 | awk '{print $2}')
 
-echo "Checking the installation..."
+echo "安装检查..."
 validation=$(pgrep -f shellinaboxd)
 if [ ! -z "${validation}" ]; then
   echo
-  echo -e "\\e[32mInstallation done..\\e[0m"
+  echo -e "\\e[32m安装完成..\\e[0m"
   echo
-  echo "You can now access the web terminal here: http://$ip_address:4200"
-  echo "You can also add this to your Home-Assistant config in an 'panel_iframe'"
+  echo "现在可以通过 http://$ip_address:4200 访问终端"
+  echo "你也可以把这个页面用 'panel_iframe' 组件添加到 Home-Assistant"
   echo
 else
   echo
-  echo -e "\\e[31mInstallation failed..."
-  echo -e "\\e[31mAborting..."
-  echo -e "\\e[0mIf you have issues with this script, please say something in the #devs_hassbian channel on Discord."
+  echo -e "\\e[31m安装失败..."
+  echo -e "\\e[31m正在退出..."
+  echo -e "\\e[0m对此脚本有任何疑问或建议, 欢迎加QQ群515348788讨论"
   echo
   return 1
 fi

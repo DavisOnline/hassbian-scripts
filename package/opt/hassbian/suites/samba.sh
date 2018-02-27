@@ -1,30 +1,30 @@
 #!/bin/bash
 
 function samba-show-short-info {
-  echo "Samba install script for Hassbian."
+  echo "Samba 安装脚本"
 }
 
 function samba-show-long-info {
-  echo "Installs the samba package for sharing the Hassbian configuration files."
-  echo "over the network."
+  echo "安装 Samba 以共享文件"
 }
 
 function samba-show-copyright-info {
   echo "Copyright(c) 2017 Fredrik Lindqvist <https://github.com/Landrash>."
+  echo "本地化：墨澜 <http://cxlwill.cn>"
 }
 
 function samba-install-package {
 samba-show-short-info
 samba-show-copyright-info
 
-echo "Running apt-get preparation"
+echo "安装软件"
 apt-get update
 apt-get install -y samba
 
-echo "Adding homeassistant Samba user"
+echo "添加 homeassistant Samba 用户"
 sudo smbpasswd -a homeassistant -n
 
-echo "Adding shared folder for Home Assistant configuration directory"
+echo "共享 Home Assistant 配置文件夹"
 cd /etc/samba/ || exit
 sudo patch <<'EOF'
 --- smb.conf 2017-02-02 20:29:42.383603738 +0000
@@ -44,24 +44,26 @@ sudo patch <<'EOF'
 EOF
 
 
-echo "Restarting Samba service"
+echo "重启 Samba 服务"
 sudo systemctl restart smbd.service
 
 ip_address=$(ifconfig | grep "inet.*broadcast" | grep -v 0.0.0.0 | awk '{print $2}')
 
-echo "Checking the installation..."
+echo "安装检查..."
 validation=$(pgrep -x smbd)
 if [ ! -z "${validation}" ]; then
   echo
-  echo -e "\\e[32mInstallation done..\\e[0m"
+  echo -e "\\e[32m安装完成..\\e[0m"
   echo
-  echo "Configuration is now available as a Samba share at \\\\$ip_address\\homeassistant"
+  echo "你的 HA 配置文件共享在 \\\\$ip_address\\homeassistant"
   echo
+  echo -e "\\e[0m对此脚本有任何疑问或建议, 欢迎加QQ群515348788讨论"
 else
   echo
-  echo -e "\\e[31mInstallation failed..."
-  echo -e "\\e[31mAborting..."
-  echo -e "\\e[0mIf you have issues with this script, please say something in the #devs_hassbian channel on Discord."
+  echo -e "\\e[31m安装失败..."
+  echo -e "\\e[31m退出..."
+  echo -e "\\e[0m对此脚本有任何疑问或建议, 欢迎加QQ群515348788讨论"
+  echo -e "\\e[0mHome Assistant入门视频教程：http://t.cn/RQPeEQv"
   echo
   return 1
 fi

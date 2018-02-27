@@ -1,31 +1,32 @@
 #!/bin/bash
 function hassbian-show-short-info {
-  echo "Upgrade the base OS installation on this system."
+  echo "更新 Hassbian 系统"
 }
 
 function hassbian-show-long-info {
-  echo "Upgrade the base OS installation on this system."
+  echo "更新 Hassbian 系统"
 }
 
 function hassbian-show-copyright-info {
-  echo "Original concept by Ludeeus <https://github.com/Ludeeus>."
-  echo "Modyfied by Landrash <https://github.com/Landrash>."
+  echo "原创：Ludeeus <https://github.com/Ludeeus>."
+  echo "修改：Landrash <https://github.com/Landrash>."
+  echo "本地化：墨澜 <http://cxlwill.cn>"
 }
 
 function hassbian-upgrade-package {
 hassbian-show-short-info
 hassbian-show-copyright-info
 
-echo "Updating package list"
+echo "更新软件表"
 sudo apt update
 
-echo "Upgrading base operating system"
+echo "更新系统"
 sudo apt upgrade -y
 
 echo
-echo "Upgrade complete."
+echo "更新完成"
 echo
-echo "Note that you may need to reboot the raspberry Pi for some updates to take effect."
+echo "部分更新重启后才能生效"
 echo
 return 0
 }

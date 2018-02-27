@@ -1,16 +1,17 @@
 #!/bin/bash
 function homebridge-show-short-info {
-  echo "Installs and configure Homebridge for Home Assistant."
+  echo "Homebridge 安装脚本"
 }
 
 function homebridge-show-long-info {
-  echo "Installs and configure Homebridge for Home Assistant"
-	echo "This will allow you to use HomeKit enabled devices to control Home Assistant."
+  echo "安装及配置 Homebridge"
+	echo "安装后你将可以通过 Homekit 控制 Home Assistant"
 }
 
 function homebridge-show-copyright-info {
-	echo "Original concept by Ludeeus <https://github.com/ludeeus>"
-	echo "Disclaimer: Some parts of this script is inspired by Dale Higgs <https://github.com/dale3h>"
+	echo "原创：Ludeeus <https://github.com/ludeeus>"
+	echo "部分脚本受启发于 Dale Higgs <https://github.com/dale3h>"
+  echo "本地化：墨澜 <http://cxlwill.cn>"
 }
 
 function homebridge-install-package {
@@ -22,40 +23,43 @@ if [ "$ACCEPT" == "true" ]; then
   HOMEASSISTANT_PASSWORD=""
 else
   echo ""
-  echo "Please take a moment to setup the Homebridge configuration..."
+  echo "请进行 Homebridge 相关设置..."
   echo ""
-  echo "Example: https://home.duckdns.org:8123"
-  echo -n "Enter your Home Assistant URL and port: "
+  echo "例如：https://home.duckdns.org:8123"
+  echo -n "输入你的 Home Assistant URL，如带端口请包含 "
   read -r HOMEASSISTANT_URL
   if [ ! "$HOMEASSISTANT_URL" ]; then
       HOMEASSISTANT_URL="http://127.0.0.1:8123"
   fi
   echo ""
   echo ""
-  echo -n "Enter your Home Assistant API password: "
+  echo -n "请输入 Home Assistant 密码，如无直接回车"
   read -s -r HOMEASSISTANT_PASSWORD
   echo
 fi
 
 if [ "$ACCEPT" != "true" ]; then
   if [ -f "/usr/sbin/samba" ]; then
-    echo -n "Do you want to add Samba share for Homebridge configuration? [N/y] : "
+    echo -n "是否对 Homebridge 配置文件开启 Samba 共享？ [N/y] : "
     read -r SAMBA
   fi
 fi
 
-echo "Preparing system, and adding dependencies..."
+echo "系统准备及依赖安装..."
 sudo apt update
 sudo apt -y upgrade
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 sudo apt install -y nodejs
 sudo apt install -y libavahi-compat-libdnssd-dev
 
-echo "Installing Homebridge for Home Assistant..."
+echo "切换为淘宝镜像源"
+sudo npm config set registry https://registry.npm.taobao.org
+
+echo "安装 Homebridge 及 Home Assistant 联动插件"
 sudo npm install -g --unsafe-perm homebridge hap-nodejs node-gyp
 sudo npm install -g homebridge-homeassistant
 
-echo "Adding homebridge user, and creating config file..."
+echo "添加 homebridge 用户并创建配置文件..."
 sudo useradd --system --create-home homebridge
 sudo mkdir /home/homebridge/.homebridge
 sudo touch /home/homebridge/.homebridge/config.json
@@ -87,7 +91,7 @@ cat > /home/homebridge/.homebridge/config.json <<EOF
 EOF
 sudo chown -R homebridge /home/homebridge
 
-echo "Creating system startup file."
+echo "创建系统服务"
 cat > /etc/systemd/system/homebridge.service <<EOF
 [Unit]
 Description=Node.js HomeKit Server
@@ -106,13 +110,13 @@ KillMode=process
 WantedBy=multi-user.target
 EOF
 
-echo "Enabling and starting service."
+echo "启用并启动 Homebridge 服务"
 sudo systemctl daemon-reload
 sudo systemctl enable homebridge.service
 sudo systemctl start homebridge.service
 
 if [ "$SAMBA" == "y" ] || [ "$SAMBA" == "Y" ]; then
-	echo "Adding configuration to Samba..."
+	echo "添加配置至 Samba..."
 	sudo smbpasswd -a homebridge -n
 	echo "[homebridge]" | tee -a /etc/samba/smb.conf
 	echo "path = /home/homebridge/.homebridge" | tee -a /etc/samba/smb.conf
@@ -122,27 +126,26 @@ if [ "$SAMBA" == "y" ] || [ "$SAMBA" == "Y" ]; then
 	echo "directory mask = 0755" | tee -a /etc/samba/smb.conf
 	echo "force user = homebridge" | tee -a /etc/samba/smb.conf
 	echo "" | tee -a /etc/samba/smb.conf
-	echo "Restarting Samba service"
+	echo "重启 Samba 服务"
 	sudo systemctl restart smbd.service
 fi
 
-echo "Checking the installation..."
+echo "安装检查..."
 validation=$(pgrep -f homebridge)
 if [ ! -z "${validation}" ]; then
   echo
-  echo -e "\\e[32mInstallation done.\\e[0m"
+  echo -e "\\e[32m安装完成\\e[0m"
   echo
-  echo "Homebridge is now running and you can add it to your"
-  echo "HomeKit app on your iOS device, when you are asked for a pin"
-  echo "use this: '$HOMEBRIDGE_PIN'"
-  echo "For more information see this repo:"
-  echo "https://github.com/home-assistant/homebridge-homeassistant#customization"
-  echo
+  echo "Homebridge 已启动你可以使用 家庭 应用添加设备"
+  echo "添加时 PIN 码为 '$HOMEBRIDGE_PIN'"
+  echo "欢迎阅读相关中文文档：https://home-assistant.cc/project/homebridge/"
+  echo -e "\\e[0m对此脚本有任何疑问或建议, 欢迎加QQ群515348788讨论"
 else
   echo
-  echo -e "\\e[31mInstallation failed..."
-  echo -e "\\e[31mAborting..."
-  echo -e "\\e[0mIf you have issues with this script, please say something in the #devs_hassbian channel on Discord."
+  echo -e "\\e[31m安装失败..."
+  echo -e "\\e[31m退出..."
+  echo -e "\\e[0m对此脚本有任何疑问或建议, 欢迎加QQ群515348788讨论"
+  echo -e "\\e[0mHome Assistant入门视频教程：http://t.cn/RQPeEQv"
   echo
 	return 1
 fi
