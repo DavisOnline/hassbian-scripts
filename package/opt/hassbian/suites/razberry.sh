@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function razberry-show-short-info {
-  echo "Disables Bluetooth for the use of a RaZberry with Hassbian."
+  echo "关闭 Hassbian 中的蓝牙服务"
 }
 
 function razberry-show-long-info {

@@ -1,6 +1,6 @@
 #!/bin/bash
 function homeassistant-dev-show-short-info {
-  echo "Home Assistant 开发版安装脚本"
+  echo "Home Assistant 开发版"
 }
 
 function homeassistant-dev-show-long-info {

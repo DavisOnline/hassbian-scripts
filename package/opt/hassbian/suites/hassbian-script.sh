@@ -1,6 +1,6 @@
 #!/bin/bash
 function hassbian-script-show-short-info {
-    echo "Hassbian-Script 更新脚本"
+    echo "Hassbian-Script"
 }
 
 function hassbian-script-show-long-info {

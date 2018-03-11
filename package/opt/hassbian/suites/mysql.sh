@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function mysql-show-short-info {
-  echo "MySQL 安装脚本"
+  echo "MySQL 数据库"
 }
 
 function mysql-show-long-info {

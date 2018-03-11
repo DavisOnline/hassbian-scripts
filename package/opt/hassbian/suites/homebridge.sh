@@ -1,6 +1,6 @@
 #!/bin/bash
 function homebridge-show-short-info {
-  echo "Homebridge 安装脚本"
+  echo "Homebridge"
 }
 
 function homebridge-show-long-info {

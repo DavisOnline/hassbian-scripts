@@ -1,6 +1,6 @@
 #!/bin/bash
 function webterminal-show-short-info {
-  echo "安装网页终端"
+  echo "网页版终端"
 }
 
 function webterminal-show-long-info {

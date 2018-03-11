@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function postgresql-show-short-info {
-  echo "PostgreSQL 安装脚本"
+  echo "PostgreSQL 数据库"
 }
 
 function postgresql-show-long-info {

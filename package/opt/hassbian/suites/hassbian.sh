@@ -1,6 +1,6 @@
 #!/bin/bash
 function hassbian-show-short-info {
-  echo "更新 Hassbian 系统"
+  echo "Hassbian 系统"
 }
 
 function hassbian-show-long-info {

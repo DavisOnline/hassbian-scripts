@@ -1,15 +1,16 @@
 #!/bin/bash
 function duckdns-show-short-info {
-  echo "Setup for Duck DNS auto renewal, and generates SSL certificate."
+  echo "Duck DNS 自动更新及 SSL 证书自动生成"
 }
 
 function duckdns-show-long-info {
-  echo "This script adds an cron job to auto uppdate you the WAN IP address for the defined domain."
-  echo "This script can also generate SSL certificate for https with Let’s Encrypt."
+  echo "此脚本将添加定时任务用来更新你的动态 IP 地址"
+  echo "此脚本还将使用 Let’s Encrypt 自动生成 SSL 证书"
 }
 
 function duckdns-show-copyright-info {
-  echo "Original concept by Ludeeus <https://github.com/ludeeus>."
+  echo "原创：Ludeeus <https://github.com/ludeeus>."
+  echo "本地化：cxlwill <http://cxlwill.cn>."
 }
 
 function duckdns-install-package {

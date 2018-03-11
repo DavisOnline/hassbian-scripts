@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function samba-show-short-info {
-  echo "Samba 安装脚本"
+  echo "Samba 文件共享"
 }
 
 function samba-show-long-info {

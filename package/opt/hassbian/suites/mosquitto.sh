@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function mosquitto-show-short-info {
-  echo "Mosquitto 安装脚本"
+  echo "Mosquitto 数据库"
 }
 
 function mosquitto-show-long-info {

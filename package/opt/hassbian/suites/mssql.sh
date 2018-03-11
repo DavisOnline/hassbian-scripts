@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function mssql-show-short-info {
-  echo "MS SQL 安装脚本"
+  echo "MS SQL 数据库"
 }
 
 function mssql-show-long-info {

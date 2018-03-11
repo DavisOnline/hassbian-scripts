@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function mariadb-show-short-info {
-  echo "MariaDB 安装脚本"
+  echo "MariaDB 数据库"
 }
 
 function mariadb-show-long-info {

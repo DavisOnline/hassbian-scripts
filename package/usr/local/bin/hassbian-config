@@ -4,8 +4,8 @@ SUITE_INSTALL_DIR=/opt/hassbian/suites
 SUITE_CONTROL_DIR=/srv/homeassistant/hassbian/control
 
 function usage {
-  printf "usage: hassbian-config [command] [suite] [options]\\n"
-  printf "run 'hassbian-config --help' to see all options\\n"
+  printf "使用方法：hassbian-config [command] [suite] [options]\\n"
+  printf "运行 'hassbian-config --help' 查看所有选项\\n"
   return 0
 }
 
@@ -13,21 +13,21 @@ function help {
   printf "hassbian-config\\n"
   printf "%s\\n" "version: $(hassbian-config -V)"
   printf "\\n"
-  printf "usage: hassbian-config [command] [suite] [options]\\n"
-  printf "where [command] is one of:\\n"
-  printf "%-8s\\t%s\\n" "  install" "Installs a software [suite]"
-  printf "%-8s\\t%s\\n" "  upgrade" "Upgrades a software [suite]"
-  printf "%-8s\\t%s\\n" "  show" "To see available [suite] for install/upgrade"
-  printf "%-8s\\t%s\\n" "  log" "Displays an log of the last operation"
-  printf "%-8s\\t%s\\n" "  share-log" "Generates an hastebin link of the last operation"
+  printf "使用：hassbian-config [command] [suite] [options]\\n"
+  printf "其中命令 [command] 为：\\n"
+  printf "%-8s\\t%s\\n" "  install" "安装软件包 [suite]"
+  printf "%-8s\\t%s\\n" "  upgrade" "升级软件包 [suite]"
+  printf "%-8s\\t%s\\n" "  show" "查看可供安装或升级的软件包 [suite]"
+  printf "%-8s\\t%s\\n" "  log" "显示上次操作日志"
+  printf "%-8s\\t%s\\n" "  share-log" "生成上次操作日志的 hastebin 代码共享链接"
   printf "\\n"
   printf "available optional [options]:\\n"
-  printf "%-10s\\t%s\\n" " -y | --accept" "Accept defaults on scripts that allow this"
-  printf "%-10s\\t%s\\n" " -f | --force" "Force run an script, this is useful if you need to reinstall a package"
+  printf "%-10s\\t%s\\n" " -y | --accept" "安装过程中接受所有预设"
+  printf "%-10s\\t%s\\n" " -f | --force" "强制运行脚本，在重装软件时特别管用"
   printf "\\n"
   printf "other [command] available:\\n"
-  printf "%-10s\\t%s\\n" " -V | --version" "Prints the version of hassbian-config"
-  printf "%-10s\\t%s\\n" " -H | --help" "Shows this help"
+  printf "%-10s\\t%s\\n" " -V | --version" "显示 hassbian-config 当前版本"
+  printf "%-10s\\t%s\\n" " -H | --help" "显示此帮助页面"
   printf "\\n"
   return 0
 }
@@ -46,7 +46,7 @@ function get-all-suite-installers {
 
 
 function show-suites {
-  echo -e "Install scripts: (Usage 'sudo hassbian-config install \e[32msuite-name\e[0m')"
+  echo -e "安装软件包: (使用 'sudo hassbian-config install \e[32msuite-name\e[0m')"
   installers=$(get-all-suite-installers)
   for i in $installers
   do
@@ -58,7 +58,7 @@ function show-suites {
     fi
     printf "\e[32m%-20s\e[0m %s\n" "$i$SUITESTATE" "$(show-suite-info "$i")"
   done
-  echo -e "To view more info about a suite type: 'hassbian-config show \e[32msuite-name\e[0m'"
+  echo -e "查询具体软件包详情请执行：'hassbian-config show \e[32msuite-name\e[0m'"
   return 0
 }
 
@@ -73,7 +73,7 @@ function show-suite-long-info {
 function check-permission {
   if (( EUID != 0 ))
   then
-    echo "Error: hassbian-config must be run as root (with sudo) for this to be possible"
+    echo "错误：hassbian-config 必须以 root (或 sudo) 用户运行"
     exit 1
   fi
   return 0
@@ -83,10 +83,10 @@ function share-log {
   if [ "$ACCEPT" == "true" ]; then
     a=$(cat $LOGFILE); curl -X POST -s -d "$a" https://hastebin.com/documents | awk -F '"' '{print "https://hastebin.com/"$4}'
   else
-    echo "This will put the output from your last operation on hastebin."
-    echo "This could include sensitive informastion."
-    echo "If you are unsure about what it contains, you can run 'hassbian-config log' to check."
-    echo -n "Do you want to create an hastebin link? [N/y] : "
+    echo "此步骤将上传你的之前操作到 hastebin"
+    echo "此举可能会产生隐私问题"
+    echo "如果你不确定具体包含的内容, 可以执行 'hassbian-config log' 确认."
+    echo -n "是否想创建 hastebin 链接? [N/y] : "
     read -r  RESPONSE
     if [ "$RESPONSE" == "y" ] || [ "$RESPONSE" == "Y" ]; then
       echo ""
@@ -98,7 +98,7 @@ function share-log {
 
 function install-suite {
   if [ "$(id -u)" != "0" ]; then
-    echo "This script must be run with sudo. Use 'sudo hassbian-config install $1'" 1>&2
+    echo "此脚本必须以 sudo 用户运行。请使用 'sudo hassbian-config install $1'" 1>&2
     return 1
   fi
   if [ ! -f $SUITE_CONTROL_DIR/"$1" ]; then
@@ -111,11 +111,11 @@ function install-suite {
     "$1"-install-package | tee $LOGFILE
     sed -i -- 's/SCRIPTSTATE='"$SUITESTATE"'/SCRIPTSTATE=installed/g' $SUITE_CONTROL_DIR/"$1"
   elif [ "$SUITESTATE" == "installed" ]; then
-    echo "$1 is already installed, trying upgrade script..."
+    echo "$1 已安装，尝试升级脚本..."
     UPGRADE=$(grep "$1"-upgrade-package $SUITE_INSTALL_DIR/"$1".sh)
   if [ "$UPGRADE" == "" ]; then
-    echo "Upgrade script is not available..."
-    echo "You can force run the install script like this:"
+    echo "升级脚本不可用..."
+    echo "你可以进行强制安装："
     echo "sudo hassbian-config -f install $1"
     exit
   fi
@@ -131,13 +131,13 @@ function install-suite {
 
 function upgrade-suite {
   if [ "$(id -u)" != "0" ]; then
-    echo "This script must be run with sudo. Use 'sudo hassbian-config upgrade $1'" 1>&2
+    echo "此脚本必须以 sudo 用户运行。请使用 'sudo hassbian-config upgrade $1'" 1>&2
     return 1
   fi
   UPGRADE=$(grep "$1"-upgrade-package $SUITE_INSTALL_DIR/"$1".sh)
   if [ "$UPGRADE" == "" ]; then
-    echo "Upgrade script is not available..."
-    echo "You can force run the install script like this:"
+    echo "升级脚本不可用..."
+    echo "你可以进行强制安装："
     echo "sudo hassbian-config -f install $1"
   fi
   check-permission
@@ -194,7 +194,7 @@ case $COMMAND in
       if verify-suite "$SUITE"; then
         RUN="show-suite-long-info $SUITE"
       else
-        RUN="echo suite $SUITE doesn't exist."
+        RUN="echo 软件包 $SUITE 不存在"
       fi
     else
       RUN="show-suites"
@@ -215,7 +215,7 @@ case $COMMAND in
     if verify-suite "$SUITE"; then
       RUN="upgrade-suite $SUITE"
     else
-      RUN="echo suite $SUITE doesn't exist."
+      RUN="echo 软件包 $SUITE 不存在"
     fi
     shift # past argument
     shift # past value

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function tradfri-show-short-info {
-    echo "Tradfri install script for Hassbian"
+    echo "宜家 Tradfri 网关"
 }
 
 function tradfri-show-long-info {

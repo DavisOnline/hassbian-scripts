@@ -1,10 +1,10 @@
 #!/bin/bash
 function appdaemon-show-short-info {
-  echo "AppDaemon安装脚本"
+  echo "AppDaemon"
 }
 
 function appdaemon-show-long-info {
-  echo "在独立虚拟环境中安装AppDaemon"
+  echo "在独立虚拟环境中安装 AppDaemon"
 }
 
 function appdaemon-show-copyright-info {
@@ -18,7 +18,7 @@ appdaemon-show-copyright-info
 
 if [ "$ACCEPT" != "true" ]; then
   if [ -f "/usr/sbin/samba" ]; then
-    echo -n "是否对 AppDaemon 配置文件开启 Samba 共享？[N/y] : "
+    echo -n "是否对 AppDaemon 配置文件开启 Samba 文件共享？[N/y] : "
     read -r SAMBA
   fi
 fi
@@ -87,13 +87,13 @@ if [ ! -z "${validation}" ]; then
   echo
   echo "欢迎阅读相关英文文档：http://appdaemon.readthedocs.io/en/latest/"
   echo "欢迎阅读 HA 中文文档：https://home-assistant.cc"
-  echo "对此脚本有任何疑问或建议, 欢迎加QQ群515348788讨论"
+  echo "对此脚本有任何疑问或建议, 欢迎加QQ群 515348788 讨论"
   echo "Home Assistant入门视频教程：http://t.cn/RQPeEQv"
 else
   echo
   echo -e "\\e[31m安装失败..."
   echo -e "\\e[31m退出..."
-  echo -e "\\e[0m对此脚本有任何疑问或建议, 欢迎加QQ群515348788讨论"
+  echo -e "\\e[0m对此脚本有任何疑问或建议, 欢迎加QQ群 515348788 讨论"
   echo -e "\\e[0mHome Assistant入门视频教程：http://t.cn/RQPeEQv"
   echo
   return 1
@@ -134,14 +134,14 @@ if [ ! -z "${validation}" ]; then
   echo
   echo "欢迎阅读相关英文文档：http://appdaemon.readthedocs.io/en/latest/"
   echo "欢迎阅读 HA 中文文档：https://home-assistant.cc"
-  echo "对此脚本有任何疑问或建议, 欢迎加QQ群515348788讨论"
+  echo "对此脚本有任何疑问或建议, 欢迎加QQ群 515348788 讨论"
   echo "Home Assistant入门视频教程：http://t.cn/RQPeEQv"
   echo
 else
   echo
   echo -e "\\e[31m更新失败..."
   echo -e "\\e[31m退出..."
-  echo -e "\\e[0m对此脚本有任何疑问或建议, 欢迎加QQ群515348788讨论"
+  echo -e "\\e[0m对此脚本有任何疑问或建议, 欢迎加QQ群 515348788 讨论"
   echo -e "\\e[0mHome Assistant入门视频教程：http://t.cn/RQPeEQv"
   echo
   return 1

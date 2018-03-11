@@ -1,6 +1,6 @@
 #!/bin/bash
 function homeassistant-show-short-info {
-  echo "Home Assistant 安装脚本"
+  echo "Home Assistant 系统"
 }
 
 function homeassistant-show-long-info {

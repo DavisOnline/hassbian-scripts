@@ -1,6 +1,6 @@
 #!/bin/bash
 function hassbian-script-dev-show-short-info {
-  echo "Hassbian-Script 开发版安装脚本"
+  echo "Hassbian-Script 开发版"
 }
 
 function hassbian-script-dev-show-long-info {
