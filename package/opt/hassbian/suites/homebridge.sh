@@ -84,7 +84,7 @@ cat > /home/homebridge/.homebridge/config.json <<EOF
       "host": "${HOMEASSISTANT_URL}",
       "password": "${HOMEASSISTANT_PASSWORD}",
       "supported_types": ["automation", "binary_sensor", "climate", "cover", "device_tracker", "fan", "group", "input_boolean", "light", "lock", "media_player", "remote", "scene", "script", "sensor", "switch", "vacuum"],
-	  "default_visibility": "hidden"
+	    "default_visibility": "visible"
     }
   ]
 }
