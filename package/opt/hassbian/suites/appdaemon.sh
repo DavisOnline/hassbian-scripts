@@ -40,6 +40,11 @@ echo "创建 AppDaemon 配置文件夹"
 mkdir /home/homeassistant/appdaemon
 mkdir /home/homeassistant/appdaemon/apps
 
+echo "安装源管理工具"
+pip3 install pqi -i https://mirrors.aliyun.com/pypi/simple/
+echo "使用阿里云源"
+pqi use aliyun
+
 echo "安装最新版本 AppDaemon"
 pip3 install wheel -i https://mirrors.aliyun.com/pypi/simple/
 pip3 install appdaemon -i https://mirrors.aliyun.com/pypi/simple/

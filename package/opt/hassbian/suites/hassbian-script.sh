@@ -4,7 +4,7 @@ function hassbian-script-show-short-info {
 }
 
 function hassbian-script-show-long-info {
-    echo "更新 hassbian-scripts"
+    echo "更新汉化版 hassbian-scripts"
 }
 
 function hassbian-script-show-copyright-info {
