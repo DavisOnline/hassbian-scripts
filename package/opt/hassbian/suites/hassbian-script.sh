@@ -20,7 +20,7 @@ echo "切换至临时文件夹"
 cd /tmp || exit
 
 echo "下载最新版本脚本"
-curl https://api.github.com/repos/home-assistant/hassbian-scripts/releases/latest | grep "browser_download_url.*deb" | cut -d : -f 2,3 | tr -d \" | wget -qi -
+curl https://api.github.com/repos/cxlwill/hassbian-scripts/releases/latest | grep "browser_download_url.*deb" | cut -d : -f 2,3 | tr -d \" | wget -qi -
 
 # Setting package name
 HASSBIAN_PACKAGE=$(echo hassbian*.deb)
