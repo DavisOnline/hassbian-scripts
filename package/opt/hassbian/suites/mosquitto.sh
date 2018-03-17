@@ -15,9 +15,6 @@ function mosquitto-show-copyright-info {
 }
 
 function mosquitto-install-package {
-mosquitto-show-short-info
-mosquitto-show-copyright-info
-
 if [ "$ACCEPT" == "true" ]; then
   mqtt_username=pi
   mqtt_password=raspberry

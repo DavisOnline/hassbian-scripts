@@ -13,9 +13,6 @@ function appdaemon-show-copyright-info {
 }
 
 function appdaemon-install-package {
-appdaemon-show-short-info
-appdaemon-show-copyright-info
-
 if [ "$ACCEPT" != "true" ]; then
   if [ -f "/usr/sbin/samba" ]; then
     echo -n "是否对 AppDaemon 配置文件开启 Samba 文件共享？[N/y] : "
@@ -107,6 +104,7 @@ return 0
 }
 
 function appdaemon-upgrade-package {
+
 appdaemon-show-short-info
 appdaemon-show-copyright-info
 

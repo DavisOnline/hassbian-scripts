@@ -14,6 +14,7 @@ function mysql-show-copyright-info {
 }
 
 function mysql-install-package {
+
 mysql-show-short-info
 mysql-show-copyright-info
 

@@ -14,6 +14,7 @@ function postgresql-show-copyright-info {
 }
 
 function postgresql-install-package {
+
 postgresql-show-short-info
 postgresql-show-copyright-info
 

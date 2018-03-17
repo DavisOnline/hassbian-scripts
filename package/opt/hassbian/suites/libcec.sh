@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function libcec-show-short-info {
-  echo "libcec install script for Hassbian."
+  echo "Libcec hdmi 自动启动"
 }
 
 function libcec-show-long-info {
@@ -13,9 +13,6 @@ function libcec-show-copyright-info {
 }
 
 function libcec-install-package {
-libcec-show-short-info
-libcec-show-copyright-info
-
 echo "Running apt-get preparation"
 apt-get update
 apt-get install -y cmake libudev-dev libxrandr-dev swig
@@ -77,13 +74,11 @@ if [ ! -z "${validation}" ]; then
   echo -e "\\e[32mInstallation done..\\e[0m"
   echo
   echo "To continue have a look at https://home-assistant.io/components/hdmi_cec/"
-  echo "It's recomended that you restart your Pi before continuing with testing libcec."
+  echo "It's recommended that you restart your Pi before continuing with testing libcec."
   echo
 else
   echo
   echo -e "\\e[31mInstallation failed..."
-  echo -e "\\e[31mAborting..."
-  echo -e "\\e[0mIf you have issues with this script, please say something in the #devs_hassbian channel on Discord."
   echo
   return 1
 fi

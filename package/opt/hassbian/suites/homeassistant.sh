@@ -13,6 +13,7 @@ function homeassistant-show-copyright-info {
 }
 
 function homeassistant-install-package {
+
 homeassistant-show-short-info
 homeassistant-show-copyright-info
 
@@ -52,7 +53,7 @@ systemctl start home-assistant@homeassistant.service
 
 ip_address=$(ifconfig | grep "inet.*broadcast" | grep -v 0.0.0.0 | awk '{print $2}')
 
-echo "Checking the installation..."
+echo "安装检查..."
 validation=$(pgrep -x hass)
 if [ ! -z "${validation}" ]; then
   echo
@@ -75,6 +76,7 @@ return 0
 }
 
 function homeassistant-upgrade-package {
+
 homeassistant-show-short-info
 homeassistant-show-copyright-info
 

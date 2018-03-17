@@ -14,6 +14,7 @@ function mariadb-show-copyright-info {
 }
 
 function mariadb-install-package {
+
 mariadb-show-short-info
 mariadb-show-copyright-info
 

@@ -22,8 +22,9 @@ function help {
   printf "%-8s\\t%s\\n" "  share-log" "生成上次操作日志的 hastebin 代码共享链接"
   printf "\\n"
   printf "可选变量 [options]:\\n"
-  printf "%-10s\\t%s\\n" " -y | --accept" "安装过程中接受所有预设"
-  printf "%-10s\\t%s\\n" " -f | --force" "强制运行脚本，在重装软件时特别管用"
+  printf "%-10s\\t%s\\n" " -Y | --accept" "安装过程中接受所有预设"
+  printf "%-10s\\t%s\\n" " -F | --force" "强制运行脚本，在重装软件时特别管用"
+  printf "%-10s\\t%s\\n" " -D | --debug" "输出所有命令"
   printf "\\n"
   printf "其他命令 [command] :\\n"
   printf "%-10s\\t%s\\n" " -V | --version" "显示 hassbian-config 当前版本"
@@ -44,21 +45,38 @@ function get-all-suite-installers {
   return 0
 }
 
-
 function show-suites {
-  echo -e "安装软件包: (使用 'sudo hassbian-config install \e[32msuite-name\e[0m')"
+  printf "hassbian-config 软件包列表\\n"
+  printf "如果某个\\e[1m软件\\e[0m显示为\\e[32m绿色\\e[0m 则表示你已安装此软件\\n"
+  printf "\\n"
+  printf "安装方法: (使用 'sudo hassbian-config install \\e[1m软件名\\e[0m')\\n"
   installers=$(get-all-suite-installers)
   for i in $installers
   do
-    if [ ! -f $SUITE_CONTROL_DIR/"$i" ]; then
-      SUITESTATE=""
+    if [ -f $SUITE_CONTROL_DIR/"$i" ]; then
+      SUITESTATE=$(grep "SCRIPTSTATE" $SUITE_CONTROL_DIR/"$i" | awk -F'=' '{print $2}')
     else
-      SUITESTATE=$(grep SCRIPTSTATE $SUITE_CONTROL_DIR/"$i" | awk -F'=' '{printf $2}')
-      SUITESTATE=$(printf "\e[34m $SUITESTATE%-7s")
+      SUITESTATE=""
     fi
-    printf "\e[32m%-20s\e[0m %s\n" "$i$SUITESTATE" "$(show-suite-info "$i")"
+    INSTALLER=$(grep "$i"-install-package $SUITE_INSTALL_DIR/"$i".sh)
+    if [ "$INSTALLER" != "" ]; then
+      if [ "$SUITESTATE" == "installed" ]; then
+        printf "\\e[1m\\e[32m%-20s\\e[0m %s\\n" "$i" "$(show-suite-info "$i")"
+      else
+        printf "\\e[1m%-20s\\e[0m %s\\n" "$i" "$(show-suite-info "$i")"
+      fi
+    fi
   done
-  echo -e "查询具体软件包详情请执行：'hassbian-config show \e[32msuite-name\e[0m'"
+  printf "\\n"
+  printf "Upgrade scripts: (Usage 'sudo hassbian-config upgrade \\e[1msuite\\e[0m')\\n"
+  for i in $installers
+  do
+    UPGRADE=$(grep "$i"-upgrade-package $SUITE_INSTALL_DIR/"$i".sh)
+    if [ "$UPGRADE" != "" ]; then
+      printf "\\e[1m%-20s\\e[0m %s\\n" "$i" "$(show-suite-info "$i")"
+    fi
+  done
+  echo -e "查询具体软件包详情请执行：'hassbian-config show \e[32m软件包名称\e[0m'"
   return 0
 }
 
@@ -80,8 +98,19 @@ function check-permission {
 }
 
 function share-log {
+  if [ ! -f $LOGFILE ];then
+    echo "No logfile, exiting..."
+    return 0
+  fi
   if [ "$ACCEPT" == "true" ]; then
-    a=$(cat $LOGFILE); curl -X POST -s -d "$a" https://hastebin.com/documents | awk -F '"' '{print "https://hastebin.com/"$4}'
+    loglink=$(curl -X POST -s -d "$(cat "$LOGFILE")" https://hastebin.com/documents | awk -F '"' '{print "https://hastebin.com/"$4}')
+    if [[ $loglink != *"initial"*  ]]; then
+      echo "$loglink"
+    else
+      echo "There is an issue with your network connection, or with the Hastebin API."
+      echo "Try again later."
+      return 0
+    fi
   else
     echo "此步骤将上传你的之前操作到 hastebin"
     echo "此举可能会产生隐私问题"
@@ -89,60 +118,61 @@ function share-log {
     echo -n "是否想创建 hastebin 链接? [N/y] : "
     read -r  RESPONSE
     if [ "$RESPONSE" == "y" ] || [ "$RESPONSE" == "Y" ]; then
-      echo ""
-    a=$(cat $LOGFILE); curl -X POST -s -d "$a" https://hastebin.com/documents | awk -F '"' '{print "https://hastebin.com/"$4}'
+      loglink=$(curl -X POST -s -d "$(cat "$LOGFILE")" https://hastebin.com/documents | awk -F '"' '{print "https://hastebin.com/"$4}')
+      if [[ $loglink != *"initial"*  ]]; then
+        echo "$loglink"
+      else
+        echo
+        echo "There is an issue with your network connection, or with the Hastebin API."
+        echo "Try again later."
+        return 0
+      fi
     fi
   fi
   return 0
 }
 
-function install-suite {
-  if [ "$(id -u)" != "0" ]; then
-    echo "此脚本必须以 sudo 用户运行。请使用 'sudo hassbian-config install $1'" 1>&2
-    return 1
-  fi
-  if [ ! -f $SUITE_CONTROL_DIR/"$1" ]; then
-    touch $SUITE_CONTROL_DIR/"$1"
-    echo "SCRIPTSTATE=uninstalled" > $SUITE_CONTROL_DIR/"$1"
-  fi
-    SUITESTATE=$(grep "SCRIPTSTATE" $SUITE_CONTROL_DIR/"$1" | awk -F'=' '{print $2}')
-    source $SUITE_INSTALL_DIR/"$1".sh
-  if [ "$FORCE" == "true" ]; then
-    "$1"-install-package | tee $LOGFILE
-    sed -i -- 's/SCRIPTSTATE='"$SUITESTATE"'/SCRIPTSTATE=installed/g' $SUITE_CONTROL_DIR/"$1"
-  elif [ "$SUITESTATE" == "installed" ]; then
-    echo "$1 已安装，尝试升级脚本..."
-    UPGRADE=$(grep "$1"-upgrade-package $SUITE_INSTALL_DIR/"$1".sh)
-  if [ "$UPGRADE" == "" ]; then
-    echo "升级脚本不可用..."
-    echo "你可以进行强制安装："
-    echo "sudo hassbian-config -f install $1"
-    exit
-  fi
-    "$1"-upgrade-package | tee $LOGFILE
-    sed -i -- 's/SCRIPTSTATE='"$SUITESTATE"'/SCRIPTSTATE=installed/g' $SUITE_CONTROL_DIR/"$1"
+function run-suite { #This is the function the actually run install/upgrade.
+  source "$SUITE_INSTALL_DIR/$2".sh #Sourcing the script file.
+  "$2"-show-short-info && "$2"-show-copyright-info && printf "\\n" #Prints suite-show-short-info & suite-show-copyright-info to console.
+  if [ "$DEBUG" == "true" ]; then set -x; fi #Activating debug if --debug is used.
+  "$2"-"$1"-package #Running the script function install/upgrade SUITE.
+  RETURN=("$?") # Return value after script execution.
+  if [ "$DEBUG" == "true" ]; then set +x; fi #Deactivating debug if --debug is used.
+  if [ "$RETURN" == "0" ]; then STATE="installed"; else printf "\\e[0mIf you have issues with this script, please say something in the #devs_hassbian channel on Discord.\\n" && STATE="failed"; fi #Set suite state to installed if 0 is returned, failed otherwise.
+  echo "SCRIPTSTATE=$STATE" > "$SUITE_CONTROL_DIR/$2" #Setting status in control file.
+  return 0
+}
+
+function install-suite { #This function do checks if we can/want to install.
+  check-permission
+  INSTALL=$(grep "$1"-install-package "$SUITE_INSTALL_DIR/$1".sh) #Checking if suite has install function.
+  SUITESTATE=$(if [ -f "$SUITE_CONTROL_DIR/$1" ]; then grep "SCRIPTSTATE" "$SUITE_CONTROL_DIR/$1" | awk -F'=' '{print $2}'; else echo ""; fi) #Checking current suite state.
+  if [ "$FORCE" == "true" ]; then #Go straight to run-suite if --force is used.
+    run-suite install "$1" | tee "$LOGFILE" #Run if -F/-f/--force is used.
+  elif [ "$SUITESTATE" == "installed" ] || [ "$INSTALL" == "" ]; then #Try redirect to upgrade script if already installed.
+    printf "%s 已安装或此软件安装脚本不可用...\\n" "$1"
+    UPGRADE=$(grep "$1"-upgrade-package "$SUITE_INSTALL_DIR/$1".sh)
+    if [ "$UPGRADE" == "" ]; then
+      printf "升级脚本不可用...\\n\\n你可以强制执行安装脚本:\\nsudo hassbian-config install %s --force\\n" "$1"
+      return 0
+    fi
+    printf " %s 已找到, 执行中...\\n\\n" "$1"
+    run-suite upgrade "$1" | tee "$LOGFILE" #Redirects to upgrade script.
   else
-    source $SUITE_INSTALL_DIR/"$1".sh
-    "$1"-install-package | tee $LOGFILE
-    sed -i -- 's/SCRIPTSTATE='"$SUITESTATE"'/SCRIPTSTATE=installed/g' $SUITE_CONTROL_DIR/"$1"
+    run-suite install "$1" | tee "$LOGFILE" #This is the default run, if no options is used.
   fi
   return 0
 }
 
-function upgrade-suite {
-  if [ "$(id -u)" != "0" ]; then
-    echo "此脚本必须以 sudo 用户运行。请使用 'sudo hassbian-config upgrade $1'" 1>&2
-    return 1
-  fi
-  UPGRADE=$(grep "$1"-upgrade-package $SUITE_INSTALL_DIR/"$1".sh)
-  if [ "$UPGRADE" == "" ]; then
-    echo "升级脚本不可用..."
-    echo "你可以进行强制安装："
-    echo "sudo hassbian-config -f install $1"
-  fi
+function upgrade-suite { #This function do checks if we can to upgrade.
   check-permission
-  source $SUITE_INSTALL_DIR/"$1".sh
-  "$1"-upgrade-package | tee $LOGFILE
+  UPGRADE=$(grep "$1"-upgrade-package "$SUITE_INSTALL_DIR/$1".sh) #Checking if suite has upgrade function.
+  if [ "$UPGRADE" == "" ]; then
+    printf "升级脚本不可用...\\n\\n你可以强制安装:\\nsudo hassbian-config install %s --force\\n" "$1"
+    return 0
+  fi
+  run-suite upgrade "$1" | tee "$LOGFILE" #This is the default run.
   return 0
 }
 
@@ -179,14 +209,17 @@ do
 COMMAND=$1
 SUITE=$2
 
-
 case $COMMAND in
-  "-f"|"--force")
+  "-F"|"-f"|"--force")
     FORCE="true"
     shift # past argument
     ;;
-  "-y"|"--accept")
+  "-Y"|"-y"|"--accept")
     ACCEPT="true"
+    shift # past argument
+    ;;
+  "-D"|"--debug")
+    DEBUG="true"
     shift # past argument
     ;;
   "show")
@@ -249,6 +282,6 @@ esac
 done
 if [ "$RUN" != "" ]; then
   $RUN
-  exit
+  exit 0
 fi
 exit 0

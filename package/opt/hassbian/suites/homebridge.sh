@@ -15,9 +15,6 @@ function homebridge-show-copyright-info {
 }
 
 function homebridge-install-package {
-homebridge-show-long-info
-homebridge-show-copyright-info
-
 if [ "$ACCEPT" == "true" ]; then
   HOMEASSISTANT_URL="http://127.0.0.1:8123"
   HOMEASSISTANT_PASSWORD=""
@@ -128,6 +125,18 @@ if [ "$SAMBA" == "y" ] || [ "$SAMBA" == "Y" ]; then
 	echo "" | tee -a /etc/samba/smb.conf
 	echo "重启 Samba 服务"
 	sudo systemctl restart smbd.service
+	echo "Adding configuration to Samba..."
+	sudo smbpasswd -a homebridge -n
+	echo "[homebridge]" | tee -a /etc/samba/smb.conf
+	echo "path = /home/homebridge/.homebridge" | tee -a /etc/samba/smb.conf
+	echo "writeable = yes" | tee -a /etc/samba/smb.conf
+	echo "guest ok = yes" | tee -a /etc/samba/smb.conf
+	echo "create mask = 0644" | tee -a /etc/samba/smb.conf
+	echo "directory mask = 0755" | tee -a /etc/samba/smb.conf
+	echo "force user = homebridge" | tee -a /etc/samba/smb.conf
+	echo "" | tee -a /etc/samba/smb.conf
+	echo "Restarting Samba service"
+	sudo systemctl restart smbd.service
 fi
 
 echo "安装检查..."
@@ -147,7 +156,7 @@ else
   echo -e "\\e[0m对此脚本有任何疑问或建议, 欢迎加QQ群515348788讨论"
   echo -e "\\e[0mHome Assistant入门视频教程：http://t.cn/RQPeEQv"
   echo
-	return 1
+    return 1
 fi
 return 0
 }

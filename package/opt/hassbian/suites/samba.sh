@@ -14,6 +14,7 @@ function samba-show-copyright-info {
 }
 
 function samba-install-package {
+
 samba-show-short-info
 samba-show-copyright-info
 
