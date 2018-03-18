@@ -49,7 +49,7 @@ function show-suites {
   printf "hassbian-config 软件包列表\\n"
   printf "如果某个\\e[1m软件\\e[0m显示为\\e[32m绿色\\e[0m 则表示你已安装此软件\\n"
   printf "\\n"
-  printf "安装方法: (使用 'sudo hassbian-config install \\e[1m软件名\\e[0m')\\n"
+  printf "可安装软件: (使用 'sudo hassbian-config install \\e[1m软件名\\e[0m')\\n"
   installers=$(get-all-suite-installers)
   for i in $installers
   do
@@ -68,7 +68,7 @@ function show-suites {
     fi
   done
   printf "\\n"
-  printf "Upgrade scripts: (Usage 'sudo hassbian-config upgrade \\e[1msuite\\e[0m')\\n"
+  printf "可升级软件: (使用 'sudo hassbian-config upgrade \\e[1m软件名\\e[0m')\\n"
   for i in $installers
   do
     UPGRADE=$(grep "$i"-upgrade-package $SUITE_INSTALL_DIR/"$i".sh)
@@ -99,7 +99,7 @@ function check-permission {
 
 function share-log {
   if [ ! -f $LOGFILE ];then
-    echo "No logfile, exiting..."
+    echo "无 Log 文件, 退出..."
     return 0
   fi
   if [ "$ACCEPT" == "true" ]; then
@@ -123,8 +123,8 @@ function share-log {
         echo "$loglink"
       else
         echo
-        echo "There is an issue with your network connection, or with the Hastebin API."
-        echo "Try again later."
+        echo "网络错误"
+        echo "请重试"
         return 0
       fi
     fi
