@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function mosquitto-show-short-info {
-  echo "Mosquitto 数据库"
+  echo "MQTT 服务器"
 }
 
 function mosquitto-show-long-info {
