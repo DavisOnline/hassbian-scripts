@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function libcec-show-short-info {
-  echo "Libcec hdmi 自动启动"
+  echo "Libcec HDMI"
 }
 
 function libcec-show-long-info {

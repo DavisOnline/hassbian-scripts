@@ -17,7 +17,7 @@ if [ "$FORCE" == "" ]; then
   printf "\\n\\n"
   echo "此脚本将会对你小 pi 产生重大影响！"
   echo "请十拿九稳加三思后再决定执行此脚本！"
-  echo "你可以强制执行此脚本:"
+  echo "考虑后请强制执行此脚本:"
   echo "sudo hassbian-config upgrade python --force"
   return 0
 fi

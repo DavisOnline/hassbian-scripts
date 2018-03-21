@@ -26,12 +26,6 @@ python3 -m venv /srv/homeassistant
 echo "进入 Home Assistant 虚拟环境"
 source /srv/homeassistant/bin/activate
 
-echo "安装源管理工具"
-pip3 install pqi -i https://mirrors.aliyun.com/pypi/simple/
-
-echo "使用阿里云源"
-pqi use aliyun
-
 echo "安装最新版本 Home Assistant"
 pip3 install setuptools wheel -i https://mirrors.aliyun.com/pypi/simple/
 pip3 install homeassistant -i https://mirrors.aliyun.com/pypi/simple/
