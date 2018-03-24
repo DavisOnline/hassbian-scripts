@@ -18,7 +18,7 @@ if [ "$ACCEPT" != "true" ]; then
     echo -n "是否对 AppDaemon 配置文件开启 Samba 文件共享？[N/y] : "
     read -r SAMBA
   fi
-  echo -n "Enter your Home Assistant API password: "
+  echo -n "输入你的 Home Assistant 密码（无直接回车）: "
   read -s -r HOMEASSISTANT_PASSWORD
   printf "\\n"
 else
