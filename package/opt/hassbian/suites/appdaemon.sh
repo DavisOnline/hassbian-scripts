@@ -18,6 +18,11 @@ if [ "$ACCEPT" != "true" ]; then
     echo -n "是否对 AppDaemon 配置文件开启 Samba 文件共享？[N/y] : "
     read -r SAMBA
   fi
+  echo -n "Enter your Home Assistant API password: "
+  read -s -r HOMEASSISTANT_PASSWORD
+  printf "\\n"
+else
+  HOMEASSISTANT_PASSWORD=""
 fi
 
 echo "创建 AppDaemon 运行文件夹"
@@ -43,7 +48,9 @@ pip3 install appdaemon -i https://mirrors.aliyun.com/pypi/simple/
 
 echo "生成 AppDaemon 配置文件"
 cp /opt/hassbian/suites/files/appdaemon.conf /home/homeassistant/appdaemon/appdaemon.yaml
-touch /home/homeassistant/appdaemon/apps.yaml
+if [ ! -z "${HOMEASSISTANT_PASSWORD}" ]; then
+    sed -i 's/#ha_key:/ha_key: $HOMEASSISTANT_PASSWORD/g' /home/homeassistant/appdaemon/appdaemon.yaml
+fi
 
 echo "退出虚拟环境"
 deactivate
