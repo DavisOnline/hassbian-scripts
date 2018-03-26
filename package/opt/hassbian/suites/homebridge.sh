@@ -45,7 +45,7 @@ fi
 echo "系统准备及依赖安装..."
 sudo apt update
 sudo apt -y upgrade
-curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
 sudo apt install -y nodejs
 sudo apt install -y libavahi-compat-libdnssd-dev
 
