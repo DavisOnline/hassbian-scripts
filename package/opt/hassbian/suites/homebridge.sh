@@ -23,7 +23,7 @@ else
   echo "请进行 Homebridge 相关设置..."
   echo ""
   echo "例如：https://home.duckdns.org:8123"
-  echo -n "输入你的 Home Assistant URL，如带端口请包含 "
+  echo -n "输入你的 Home Assistant URL，如带端口请包含"
   read -r HOMEASSISTANT_URL
   if [ ! "$HOMEASSISTANT_URL" ]; then
       HOMEASSISTANT_URL="http://127.0.0.1:8123"
@@ -71,7 +71,7 @@ cat > /home/homebridge/.homebridge/config.json <<EOF
     "port": ${HOMEBRIDGE_PORT},
     "pin": "${HOMEBRIDGE_PIN}"
   },
-  "description": "This is an example configuration file for Homebridge that includes the Home Assistant plugin.",
+  "description": "Homebridge 示例配置",
   "accessories": [
   ],
   "platforms": [
@@ -124,18 +124,6 @@ if [ "$SAMBA" == "y" ] || [ "$SAMBA" == "Y" ]; then
 	echo "force user = homebridge" | tee -a /etc/samba/smb.conf
 	echo "" | tee -a /etc/samba/smb.conf
 	echo "重启 Samba 服务"
-	sudo systemctl restart smbd.service
-	echo "Adding configuration to Samba..."
-	sudo smbpasswd -a homebridge -n
-	echo "[homebridge]" | tee -a /etc/samba/smb.conf
-	echo "path = /home/homebridge/.homebridge" | tee -a /etc/samba/smb.conf
-	echo "writeable = yes" | tee -a /etc/samba/smb.conf
-	echo "guest ok = yes" | tee -a /etc/samba/smb.conf
-	echo "create mask = 0644" | tee -a /etc/samba/smb.conf
-	echo "directory mask = 0755" | tee -a /etc/samba/smb.conf
-	echo "force user = homebridge" | tee -a /etc/samba/smb.conf
-	echo "" | tee -a /etc/samba/smb.conf
-	echo "Restarting Samba service"
 	sudo systemctl restart smbd.service
 fi
 

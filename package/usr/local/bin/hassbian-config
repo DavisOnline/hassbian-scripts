@@ -76,7 +76,7 @@ function show-suites {
       printf "\\e[1m%-20s\\e[0m %s\\n" "$i" "$(show-suite-info "$i")"
     fi
   done
-  echo -e "查询具体软件包详情请执行：'hassbian-config show \e[32m软件包名称\e[0m'"
+  printf "查询具体软件包详情请执行：'hassbian-config show \e[32m软件包名称\e[0m'"
   return 0
 }
 
@@ -107,8 +107,8 @@ function share-log {
     if [[ $loglink != *"initial"*  ]]; then
       echo "$loglink"
     else
-      echo "There is an issue with your network connection, or with the Hastebin API."
-      echo "Try again later."
+      echo "请检查网络连接或 Hastebin API"
+      echo "请重试"
       return 0
     fi
   else
