@@ -13,6 +13,21 @@ $ sudo hassbian-config install homeassistant
 $ sudo hassbian-config upgrade homeassistant
 ```
 
+## Upgrade to beta channel
+```
+$ sudo hassbian-config upgrade homeassistant --beta
+```
+
+## Upgrade to dev branch
+```
+$ sudo hassbian-config upgrade homeassistant --dev
+```
+
+## Upgrade to to a spesific version
+```
+$ sudo hassbian-config upgrade homeassistant=0.65.6
+```
+
 ## Additional info
 Running as: `homeassistant`  
 Configuration dir: `/home/homeassistant/.homeassistant/`  

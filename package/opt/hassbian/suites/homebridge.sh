@@ -45,8 +45,12 @@ fi
 echo "系统准备及依赖安装..."
 sudo apt update
 sudo apt -y upgrade
-curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
-sudo apt install -y nodejs
+node=$(which node)
+if [ -z "${node}" ]; then #Installing NodeJS if not already installed.
+  printf "下载及安装 NodeJS...\\n"
+  curl -sL https://deb.nodesource.com/setup_9.x | bash -
+  apt install -y nodejs
+fi
 sudo apt install -y libavahi-compat-libdnssd-dev
 
 echo "切换为淘宝镜像源"

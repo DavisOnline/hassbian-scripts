@@ -12,11 +12,14 @@ where command is one of:
 - `show` This will show you all available suites.
 - `log` This will show you the log of last hassbian-config operation.
 - `share-log` This will generate an hastebin link of the last hassbian-config operation.
+- `show-installed` Generates a list of installed suites.
 
 Optional flags:
 - `-Y | --accept` This will accept defaults on scripts that allow this.
 - `-F | --force` This will force run an script. This is useful if you need to reinstall a package.
 - `-D | --debug` This will output every comand to the console.
+- `-B | --beta` This will install the current beta version if implemented.
+- `--dev` This will install the current development version if implemented.
 
 Other available commands:
 - `-V | --version` This will show you the installed version of `hassbian-config`.
@@ -36,7 +39,12 @@ $ sudo apt install -y ./hassbian*
 $ sudo hassbian-config upgrade hassbian-script
 ```
 
+## Upgrade to prerelease
+```
+$ sudo hassbian-config upgrade hassbian-script --beta
+```
+
 ## Upgrade to dev branch
 ```
-$ sudo hassbian-config upgrade hassbian-script-dev
+$ sudo hassbian-config upgrade hassbian-script --dev
 ```

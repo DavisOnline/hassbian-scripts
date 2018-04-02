@@ -11,21 +11,23 @@ function usage {
 
 function help {
   printf "hassbian-config\\n"
-  printf "%s\\n" "version: $(hassbian-config -V)"
+  printf "%s\\n" "版本: $(hassbian-config -V)"
   printf "\\n"
-  printf "使用：hassbian-config [command] [suite] [options]\\n"
-  printf "其中命令 [command] 为：\\n"
-  printf "%-8s\\t%s\\n" "  install" "安装软件包 [suite]"
-  printf "%-8s\\t%s\\n" "  upgrade" "升级软件包 [suite]"
-  printf "%-8s\\t%s\\n" "  show" "查看可供安装或升级的软件包 [suite]"
-  printf "%-8s\\t%s\\n" "  log" "显示上次操作日志"
-  printf "%-8s\\t%s\\n" "  share-log" "生成上次操作日志的 hastebin 代码共享链接"
+  printf "使用方法: hassbian-config [command] [suite] [options]\\n"
+  printf "主命令 [command]:\\n"
+  printf "%-8s\\t%s\\n" "  install" "安装软件 [suite]"
+  printf "%-8s\\t%s\\n" "  upgrade" "升级软件 [suite]"
+  printf "%-8s\\t%s\\n" "  show" "查看可供安装/升级的软件 [suite]"
+  printf "%-8s\\t%s\\n" "  log" "显示上次操作log"
+  printf "%-8s\\t%s\\n" "  share-log" "生成上次操作的 hastebin 链接"
+  printf "%-8s\\t%s\\n" "  show-installed" "显示已安装软件清单"
   printf "\\n"
-  printf "可选变量 [options]:\\n"
-  printf "%-10s\\t%s\\n" " -Y | --accept" "安装过程中接受所有预设"
-  printf "%-10s\\t%s\\n" " -F | --force" "强制运行脚本，在重装软件时特别管用"
-  printf "%-10s\\t%s\\n" " -D | --debug" "输出所有命令"
-  printf "\\n"
+  printf "可选参数 [options]:\\n"
+  printf "%-10s\\t%s\\n" " -Y | --accept" "使用脚本中所有默认选项"
+  printf "%-10s\\t%s\\n" " -F | --force" "强制运行脚本,可用于软件重装"
+  printf "%-10s\\t%s\\n" " -D | --debug" "Debug模式，输出所有命令"
+  printf "%-10s\\t%s\\n" " -B | --beta" "安装 beta 版本软件"
+  printf "%-10s\\t%s\\n" " --dev" "安装 dev 开发版本软件
   printf "其他命令 [command] :\\n"
   printf "%-10s\\t%s\\n" " -V | --version" "显示 hassbian-config 当前版本"
   printf "%-10s\\t%s\\n" " -H | --help" "显示此帮助页面"
@@ -97,6 +99,20 @@ function check-permission {
   return 0
 }
 
+function raspberry_pi_zero_check {
+## Start check for Raspberry Pi Zero
+if [ "$FORCE" != "true" ]; then
+  REVCODE=$(sudo cat /proc/cpuinfo | grep 'Revision' | awk '{print $3}' | sed 's/^ *//g' | sed 's/ *$//g')
+  if [ "$REVCODE" = "90092" ] || [ "$REVCODE" = "90093" ] || [ "$REVCODE" = "0x9000C1" ]; then
+    if [[ "$1" =~ ^(mosquitto|homebridge|cloud9)$ ]]; then
+      echo "This suite can't be installed on Raspberry Pi Zero..."
+      exit 0
+    fi
+  fi
+fi
+## End check for Raspberry Pi Zero
+
+}
 function share-log {
   if [ ! -f $LOGFILE ];then
     echo "无 Log 文件, 退出..."
@@ -146,6 +162,7 @@ function run-suite { #This is the function the actually run install/upgrade.
 
 function install-suite { #This function do checks if we can/want to install.
   check-permission
+  raspberry_pi_zero_check "$1"
   INSTALL=$(grep "$1"-install-package "$SUITE_INSTALL_DIR/$1".sh) #Checking if suite has install function.
   SUITESTATE=$(if [ -f "$SUITE_CONTROL_DIR/$1" ]; then grep "SCRIPTSTATE" "$SUITE_CONTROL_DIR/$1" | awk -F'=' '{print $2}'; else echo ""; fi) #Checking current suite state.
   if [ "$FORCE" == "true" ]; then #Go straight to run-suite if --force is used.
@@ -187,12 +204,13 @@ function verify-suite {
 
 function show-installed-suites {
   INSTALLERS=$(find $SUITE_INSTALL_DIR/ -maxdepth 1 -type f | sort | awk -F'/' ' {print $NF}' | awk -F. '{print $1}')
+  echo "These suites are installed:"
   for i in $INSTALLERS
   do
   if [ -f "$SUITE_CONTROL_DIR/$i" ]; then
     STATE=$(grep "SCRIPTSTATE=installed" $SUITE_CONTROL_DIR/"$i" | awk -F'=' '{print $2}')
     if [ "$STATE" != "" ]; then
-      echo "$i:" "$STATE"
+      echo "$i"
     fi
   fi
   done
@@ -222,6 +240,14 @@ case $COMMAND in
     DEBUG="true"
     shift # past argument
     ;;
+  "--dev")
+    DEV="true"
+    shift # past argument
+    ;;
+  "-B"|"--beta")
+    BETA="true"
+    shift # past argument
+    ;;
   "show")
     if [ "$SUITE" != "" ]; then
       if verify-suite "$SUITE"; then
@@ -245,6 +271,12 @@ case $COMMAND in
     shift # past value
     ;;
   "upgrade")
+    if [[ "$SUITE" = *"="* ]]; then
+      VERSIONNUMBER=$(echo "$SUITE" | awk -F'=' '{print $2}')
+      SUITE=$(echo "$SUITE" | awk -F'=' '{print $1}')
+    else
+      VERSIONNUMBER=""
+    fi
     if verify-suite "$SUITE"; then
       RUN="upgrade-suite $SUITE"
     else

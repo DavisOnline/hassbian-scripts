@@ -70,23 +70,44 @@ return 0
 }
 
 function homeassistant-upgrade-package {
-
-homeassistant-show-short-info
-homeassistant-show-copyright-info
-
-echo "检查当前版本"
-pypiversion=$(curl -s https://pypi.python.org/pypi/homeassistant/json | grep '"version":' | awk -F'"' '{print $4}')
-
-sudo -u homeassistant -H /bin/bash << EOF | grep Version | awk '{print $2}'|while read -r version; do if [[ "${pypiversion}" == "${version}" ]]; then echo "You already have the latest version: $version";exit 1;fi;done
-source /srv/homeassistant/bin/activate
-pip3 show homeassistant
+if [ "$DEV" == "true"  ]; then
+  echo "此脚本将通过 Github 安装开发版 Home Assistant."
+  echo "以帮助你进行 Home Assistant 相关开发工作."
+  echo "不推荐将开发版用于日常使用环境"
+  echo -n "确定继续? [N/y] : "
+  read -r RESPONSE
+  if [ "$RESPONSE" == "y" ] || [ "$RESPONSE" == "Y" ]; then
+    RESPONSE="Y"
+  else
+    echo "退出..."
+    return 0
+  fi
+else
+  echo "检查当前版本"
+  if [ "$BETA" == "true" ]; then
+    newversion=$(curl -s https://pypi.python.org/pypi/homeassistant/json | grep '"version":' | awk -F'"' '{print $4}')
+  elif [ ! -z "${VERSIONNUMBER}" ]; then
+    verify=$(curl -s https://pypi.python.org/pypi/homeassistant/"$VERSIONNUMBER"/json)
+    if [[ "$verify" = *"Not Found"* ]]; then
+      echo "版本 $VERSIONNUMBER 未找到..."
+      echo "退出..."
+      return 0
+    else
+      newversion="$VERSIONNUMBER"
+    fi
+  else
+    newversion=$(curl -s https://api.github.com/repos/home-assistant/home-assistant/releases/latest | grep tag_name | awk -F'"' '{print $4}')
+  fi
+  sudo -u homeassistant -H /bin/bash << EOF | grep Version | awk '{print $2}'|while read -r version; do if [[ "${newversion}" == "${version}" ]]; then echo "You already have version: $version";exit 1;fi;done
+  source /srv/homeassistant/bin/activate
+  pip3 show homeassistant
 EOF
 
-if [[ $? == 1 ]]; then
-  echo "已是最新版本更新个啥"
-  exit 1
+  if [[ $? == 1 ]]; then
+    echo "更新中止"
+    exit 1
+  fi
 fi
-
 echo "停止 Home Assistant"
 systemctl stop home-assistant@homeassistant.service
 
@@ -96,9 +117,13 @@ sudo -u homeassistant -H /bin/bash << EOF
 echo "进入 Home Assistant 虚拟环境"
 source /srv/homeassistant/bin/activate
 
-echo "安装最新版本 Home Assistant"
-pip3 install --upgrade setuptools wheel -i https://mirrors.aliyun.com/pypi/simple/
-pip3 install --upgrade homeassistant -i https://mirrors.aliyun.com/pypi/simple/
+echo "升级 Home Assistant"
+pip3 install --upgrade setuptools wheel
+if [ "$DEV" == "true" ]; then
+  pip3 install git+https://github.com/home-assistant/home-assistant@dev
+else
+  pip3 install --upgrade homeassistant=="$newversion"
+fi
 
 echo "退出虚拟环境"
 deactivate
