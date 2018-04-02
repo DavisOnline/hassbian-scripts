@@ -78,7 +78,8 @@ function show-suites {
       printf "\\e[1m%-20s\\e[0m %s\\n" "$i" "$(show-suite-info "$i")"
     fi
   done
-  printf "查询具体软件包详情请执行：'hassbian-config show \e[32m软件包名称\e[0m'"
+  printf "\\n"
+  printf "查询具体软件包详情请执行：'hassbian-config show \e[32m软件包名称\e[0m' \\n"
   return 0
 }
 
@@ -93,7 +94,7 @@ function show-suite-long-info {
 function check-permission {
   if (( EUID != 0 ))
   then
-    echo "错误：hassbian-config 必须以 root (或 sudo) 用户运行"
+    echo "错误：必须以 root 用户 (或 sudo) 运行"
     exit 1
   fi
   return 0
@@ -103,7 +104,7 @@ function raspberry_pi_zero_check {
 ## Start check for Raspberry Pi Zero
 if [ "$FORCE" != "true" ]; then
   REVCODE=$(sudo cat /proc/cpuinfo | grep 'Revision' | awk '{print $3}' | sed 's/^ *//g' | sed 's/ *$//g')
-  if [ "$REVCODE" = "90092" ] || [ "$REVCODE" = "90093" ] || [ "$REVCODE" = "0x9000C1" ]; then
+  if [ "$REVCODE" = "90092" ] || [ "$REVCODE" = "90093" ] || [ "$REVCODE" = "0x9000C1" ] || [ "$REVCODE" = "9000C1" ]; then
     if [[ "$1" =~ ^(mosquitto|homebridge|cloud9)$ ]]; then
       echo "Raspberry Pi Zero 无法安装此软件..."
       exit 0
