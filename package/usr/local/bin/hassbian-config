@@ -27,7 +27,7 @@ function help {
   printf "%-10s\\t%s\\n" " -F | --force" "强制运行脚本,可用于软件重装"
   printf "%-10s\\t%s\\n" " -D | --debug" "Debug模式，输出所有命令"
   printf "%-10s\\t%s\\n" " -B | --beta" "安装 beta 版本软件"
-  printf "%-10s\\t%s\\n" " --dev" "安装 dev 开发版本软件
+  printf "%-10s\\t%s\\n" " --dev" "安装 dev 开发版本软件"
   printf "其他命令 [command] :\\n"
   printf "%-10s\\t%s\\n" " -V | --version" "显示 hassbian-config 当前版本"
   printf "%-10s\\t%s\\n" " -H | --help" "显示此帮助页面"
@@ -51,7 +51,7 @@ function show-suites {
   printf "hassbian-config 软件包列表\\n"
   printf "如果某个\\e[1m软件\\e[0m显示为\\e[32m绿色\\e[0m 则表示你已安装此软件\\n"
   printf "\\n"
-  printf "可安装软件: (使用 'sudo hassbian-config install \\e[1m软件名\\e[0m')\\n"
+  printf "可安装软件：使用 'sudo hassbian-config install \\e[1m软件名\\e[0m' 进行安装\\n"
   installers=$(get-all-suite-installers)
   for i in $installers
   do
@@ -70,7 +70,7 @@ function show-suites {
     fi
   done
   printf "\\n"
-  printf "可升级软件: (使用 'sudo hassbian-config upgrade \\e[1m软件名\\e[0m')\\n"
+  printf "可升级软件：(使用 'sudo hassbian-config upgrade \\e[1m软件名\\e[0m' 进行升级)\\n"
   for i in $installers
   do
     UPGRADE=$(grep "$i"-upgrade-package $SUITE_INSTALL_DIR/"$i".sh)
@@ -105,7 +105,7 @@ if [ "$FORCE" != "true" ]; then
   REVCODE=$(sudo cat /proc/cpuinfo | grep 'Revision' | awk '{print $3}' | sed 's/^ *//g' | sed 's/ *$//g')
   if [ "$REVCODE" = "90092" ] || [ "$REVCODE" = "90093" ] || [ "$REVCODE" = "0x9000C1" ]; then
     if [[ "$1" =~ ^(mosquitto|homebridge|cloud9)$ ]]; then
-      echo "This suite can't be installed on Raspberry Pi Zero..."
+      echo "Raspberry Pi Zero 无法安装此软件..."
       exit 0
     fi
   fi
@@ -204,7 +204,7 @@ function verify-suite {
 
 function show-installed-suites {
   INSTALLERS=$(find $SUITE_INSTALL_DIR/ -maxdepth 1 -type f | sort | awk -F'/' ' {print $NF}' | awk -F. '{print $1}')
-  echo "These suites are installed:"
+  echo "以下软件已安装:"
   for i in $INSTALLERS
   do
   if [ -f "$SUITE_CONTROL_DIR/$i" ]; then
@@ -253,7 +253,7 @@ case $COMMAND in
       if verify-suite "$SUITE"; then
         RUN="show-suite-long-info $SUITE"
       else
-        RUN="echo 软件包 $SUITE 不存在"
+        RUN="echo suite $SUITE doesn't exist"
       fi
     else
       RUN="show-suites"
@@ -280,7 +280,7 @@ case $COMMAND in
     if verify-suite "$SUITE"; then
       RUN="upgrade-suite $SUITE"
     else
-      RUN="echo 软件包 $SUITE 不存在"
+      RUN="echo suite $SUITE doesn't exist."
     fi
     shift # past argument
     shift # past value

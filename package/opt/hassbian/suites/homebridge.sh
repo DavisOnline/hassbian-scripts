@@ -22,8 +22,8 @@ else
   echo ""
   echo "请进行 Homebridge 相关设置..."
   echo ""
-  echo "例如：https://home.duckdns.org:8123"
-  echo -n "输入你的 Home Assistant URL，如带端口请包含"
+  echo "例如：http://127.0.0.1:8123"
+  echo -n "请输入你的 Home Assistant URL，注意端口和http(s)"
   read -r HOMEASSISTANT_URL
   if [ ! "$HOMEASSISTANT_URL" ]; then
       HOMEASSISTANT_URL="http://127.0.0.1:8123"
