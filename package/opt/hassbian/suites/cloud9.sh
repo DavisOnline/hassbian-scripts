@@ -19,6 +19,7 @@ if [ -z "${node}" ]; then #Installing NodeJS if not already installed.
   printf "下载及安装 NodeJS...\\n"
   curl -sL https://deb.nodesource.com/setup_9.x | bash -
   apt install -y nodejs
+  npm config set registry https://registry.npm.taobao.org
 fi
 
 echo "创建配置文件夹..."
