@@ -74,6 +74,9 @@ else
   echo "Cleanup"
   rm "$HASSBIAN_PACKAGE"
 fi
+
+systemctl daemon-reload
+
 echo
 echo "更新完成"
 echo

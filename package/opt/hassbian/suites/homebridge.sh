@@ -59,6 +59,7 @@ sudo npm config set registry https://registry.npm.taobao.org
 echo "安装 Homebridge 及 Home Assistant 联动插件"
 sudo npm install -g --unsafe-perm homebridge hap-nodejs node-gyp
 sudo npm install -g homebridge-homeassistant
+sudo npm install -g --unsafe-perm homebridge-config-ui-x
 
 echo "添加 homebridge 用户并创建配置文件..."
 sudo useradd --system --create-home homebridge
@@ -86,6 +87,16 @@ cat > /home/homebridge/.homebridge/config.json <<EOF
       "password": "${HOMEASSISTANT_PASSWORD}",
       "supported_types": ["automation", "binary_sensor", "climate", "cover", "device_tracker", "fan", "group", "input_boolean", "light", "lock", "media_player", "remote", "scene", "script", "sensor", "switch", "vacuum"],
 	    "default_visibility": "visible"
+    },
+    {
+      "platform": "config",
+      "name": "Config",
+      "port": 8120,
+      "restart": "sudo -n systemctl restart homebridge",
+      "sudo": true,
+      "log": "systemd",
+      "temp": "/sys/class/thermal/thermal_zone0/temp",
+      "theme": "blue"
     }
   ]
 }
@@ -102,7 +113,7 @@ After=syslog.target network-online.target
 [Service]
 Type=simple
 User=homebridge
-ExecStart=/usr/bin/homebridge
+ExecStart=/usr/bin/homebridge -I
 Restart=on-failure
 RestartSec=10
 KillMode=process
