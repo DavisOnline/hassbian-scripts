@@ -142,6 +142,8 @@ if [ "$SAMBA" == "y" ] || [ "$SAMBA" == "Y" ]; then
 	sudo systemctl restart smbd.service
 fi
 
+ip_address=$(ifconfig | grep "inet.*broadcast" | grep -v 0.0.0.0 | awk '{print $2}')
+
 echo "安装检查..."
 validation=$(pgrep -f homebridge)
 if [ ! -z "${validation}" ]; then
@@ -150,6 +152,8 @@ if [ ! -z "${validation}" ]; then
   echo
   echo "Homebridge 已启动你可以使用 家庭 应用添加设备"
   echo "添加时 PIN 码为 '$HOMEBRIDGE_PIN'"
+  echo "UI 界面访问地址为 $ip_address:8120"
+  echo "用户名与密码均为 admin"
   echo "欢迎阅读相关中文文档：https://home-assistant.cc/project/homebridge/"
   echo -e "\\e[0m对此脚本有任何疑问或建议, 欢迎加QQ群515348788讨论"
 else
