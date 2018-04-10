@@ -25,6 +25,10 @@ else
   HOMEASSISTANT_PASSWORD=""
 fi
 
+echo "检查 Python 版本..."
+PYTHONVER=$(echo /usr/local/lib/*python* | awk -F/ '{print $NF}')
+echo "Using $PYTHONVER..."
+
 echo "创建 AppDaemon 运行文件夹"
 sudo mkdir /srv/appdaemon
 sudo chown -R homeassistant:homeassistant /srv/appdaemon
@@ -33,7 +37,7 @@ echo "切换至 homeassistant 用户"
 sudo -u homeassistant -H /bin/bash << EOF
 
 echo "创建 AppDaemon 运行虚拟环境"
-python3 -m venv /srv/appdaemon
+$PYTHONVER -m venv /srv/appdaemon
 
 echo "进入 AppDaemon 虚拟环境"
 source /srv/appdaemon/bin/activate

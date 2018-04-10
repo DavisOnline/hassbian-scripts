@@ -108,6 +108,7 @@ EOF
     exit 1
   fi
 fi
+
 echo "停止 Home Assistant"
 systemctl stop home-assistant@homeassistant.service
 
@@ -130,7 +131,7 @@ deactivate
 EOF
 
 echo "重启 Home Assistant"
-systemctl start home-assistant@homeassistant.service
+systemctl restart home-assistant@homeassistant.service
 
 echo "安装检查..."
 validation=$(pgrep -x hass)

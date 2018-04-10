@@ -17,8 +17,8 @@ function cloud9-install-package {
 node=$(which node)
 if [ -z "${node}" ]; then #Installing NodeJS if not already installed.
   printf "下载及安装 NodeJS...\\n"
-  curl -sL https://deb.nodesource.com/setup_9.x | bash -
   apt install -y nodejs
+  printf "配置淘宝源...\\n"
   npm config set registry https://registry.npm.taobao.org
 fi
 
