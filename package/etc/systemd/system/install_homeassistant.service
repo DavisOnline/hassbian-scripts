@@ -7,7 +7,6 @@ Description=Install Home Assistant
 After=network.target
 
 [Service]
-ExecStartPre=/usr/local/bin/hassbian-config upgrade hassbian-script
 ExecStart=/usr/local/bin/hassbian-config install homeassistant
 
 [Install]
