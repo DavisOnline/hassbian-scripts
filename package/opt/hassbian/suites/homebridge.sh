@@ -48,6 +48,14 @@ sudo apt -y upgrade
 node=$(which node)
 if [ -z "${node}" ]; then #Installing NodeJS if not already installed.
   printf "下载及安装 NodeJS...\\n"
+  curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
+  file="/etc/apt/sources.list.d/nodesource.list"
+  if [ ! -f "$file" ]; then
+    touch "$file"
+    echo 'deb https://mirrors.tuna.tsinghua.edu.cn/nodesource/deb_9.x stretch main' > $file
+    echo 'deb-src https://mirrors.tuna.tsinghua.edu.cn/nodesource/deb_9.x stretch main' >> $file
+  fi
+  apt update
   apt install -y nodejs
 fi
 sudo apt install -y libavahi-compat-libdnssd-dev
