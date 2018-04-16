@@ -68,14 +68,13 @@ sudo npm install -g --unsafe-perm homebridge hap-nodejs node-gyp
 sudo npm install -g homebridge-homeassistant
 sudo npm install -g --unsafe-perm homebridge-config-ui-x
 
-echo "添加 homebridge 用户并创建配置文件..."
-sudo useradd --system --create-home homebridge
-sudo mkdir /home/homebridge/.homebridge
-sudo touch /home/homebridge/.homebridge/config.json
+echo "创建配置文件..."
+sudo mkdir /home/pi/.homebridge
+sudo touch /home/pi/.homebridge/config.json
 HOMEBRIDGE_PIN=$(printf "%03d-%02d-%03d" $((RANDOM % 999)) $((RANDOM % 99)) $((RANDOM % 999)))
 HOMEBRIDGE_USERNAME=$(hexdump -n3 -e'/3 "00:60:2F" 3/1 ":%02X"' /dev/random)
 HOMEBRIDGE_PORT=$( printf "57%03d" $((RANDOM % 999)))
-cat > /home/homebridge/.homebridge/config.json <<EOF
+cat > /home/pi/.homebridge/config.json <<EOF
 {
   "bridge": {
     "name": "Homebridge",
@@ -93,7 +92,9 @@ cat > /home/homebridge/.homebridge/config.json <<EOF
       "host": "${HOMEASSISTANT_URL}",
       "password": "${HOMEASSISTANT_PASSWORD}",
       "supported_types": ["automation", "binary_sensor", "climate", "cover", "device_tracker", "fan", "group", "input_boolean", "light", "lock", "media_player", "remote", "scene", "script", "sensor", "switch", "vacuum"],
-	    "default_visibility": "visible"
+	    "default_visibility": "visible",
+      "logging": true,
+      "verify_ssl": false
     },
     {
       "platform": "config",
@@ -108,7 +109,6 @@ cat > /home/homebridge/.homebridge/config.json <<EOF
   ]
 }
 EOF
-sudo chown -R homebridge /home/homebridge
 
 echo "创建系统服务"
 cat > /etc/systemd/system/homebridge.service <<EOF
@@ -119,7 +119,7 @@ After=syslog.target network-online.target
 
 [Service]
 Type=simple
-User=homebridge
+User=pi
 ExecStart=/usr/bin/homebridge -I
 Restart=on-failure
 RestartSec=10
@@ -136,14 +136,14 @@ sudo systemctl start homebridge.service
 
 if [ "$SAMBA" == "y" ] || [ "$SAMBA" == "Y" ]; then
 	echo "添加配置至 Samba..."
-	sudo smbpasswd -a homebridge -n
+	sudo smbpasswd -a pi -n
 	echo "[homebridge]" | tee -a /etc/samba/smb.conf
-	echo "path = /home/homebridge/.homebridge" | tee -a /etc/samba/smb.conf
+	echo "path = /home/pi/.homebridge" | tee -a /etc/samba/smb.conf
 	echo "writeable = yes" | tee -a /etc/samba/smb.conf
 	echo "guest ok = yes" | tee -a /etc/samba/smb.conf
 	echo "create mask = 0644" | tee -a /etc/samba/smb.conf
 	echo "directory mask = 0755" | tee -a /etc/samba/smb.conf
-	echo "force user = homebridge" | tee -a /etc/samba/smb.conf
+	echo "force user = pi" | tee -a /etc/samba/smb.conf
 	echo "" | tee -a /etc/samba/smb.conf
 	echo "重启 Samba 服务"
 	sudo systemctl restart smbd.service
