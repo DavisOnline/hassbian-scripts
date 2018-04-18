@@ -1,11 +1,10 @@
-## Hassbian-scripts
-These are the scripts used in the [Hassbian](https://github.com/home-assistant/pi-gen) image.
-The scripts in this repository where made to be used with the Hassbian image and the included Home Assistant instance.  
+## Hassbian-scripts 中文版
+此为 Mossbian 镜像所自带的脚本。
 
 
-## The included scripts
-The following scripts are currently included. You can view the documentation below for usage and instructions.
-<!--- When adding stuff here, please keep it alphabetical --->
+## 软件列表
+以下为脚本所附软件列表，可进入查阅具体文档。
+
 * [hassbian-config](/docs/hassbian_config.md)
   * [AppDaemon](/docs/appdaemon.md)
   * [Cloud9](/docs/cloud9.md)
@@ -26,10 +25,5 @@ The following scripts are currently included. You can view the documentation bel
 * [Changelog](https://github.com/home-assistant/hassbian-scripts/releases)
 
 ***
-## Raspbian Jessie
-If this package is used with a Debian Jessie based distribution then you need to uncomment the source repositories in  `/etc/apt/sources.list`
 
-```text
-# Uncomment line below then 'apt-get update' to enable 'apt-get source'
-deb-src http://archive.raspbian.org/raspbian/ jessie main contrib non-free rpi
-```
+
