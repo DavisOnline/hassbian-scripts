@@ -136,7 +136,6 @@ sudo systemctl start homebridge.service
 
 if [ "$SAMBA" == "y" ] || [ "$SAMBA" == "Y" ]; then
 	echo "添加配置至 Samba..."
-	sudo smbpasswd -a pi -n
 	echo "[homebridge]" | tee -a /etc/samba/smb.conf
 	echo "path = /home/pi/.homebridge" | tee -a /etc/samba/smb.conf
 	echo "writeable = yes" | tee -a /etc/samba/smb.conf
