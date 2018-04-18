@@ -110,6 +110,8 @@ cat > /home/pi/.homebridge/config.json <<EOF
 }
 EOF
 
+sudo chown -R pi /home/pi/.homebridge
+
 echo "创建系统服务"
 cat > /etc/systemd/system/homebridge.service <<EOF
 [Unit]
