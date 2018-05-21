@@ -84,10 +84,10 @@ if [ "$DEV" == "true"  ]; then
   fi
 else
   echo "检查当前版本"
-  if [ "$BETA" == "true" ]; then
-    newversion=$(curl -s https://pypi.python.org/pypi/homeassistant/json | grep '"version":' | awk -F'"' '{print $4}')
+  if [ "$BETA" == "true"  ]; then
+  newversion=$(curl -s https://api.github.com/repos/home-assistant/home-assistant/releases | grep tag_name | head -1 | awk -F'"' '{print $4}')
   elif [ ! -z "${VERSIONNUMBER}" ]; then
-    verify=$(curl -s https://pypi.python.org/pypi/homeassistant/"$VERSIONNUMBER"/json)
+    verify=$(curl -s https://pypi.org/pypi/homeassistant/"$VERSIONNUMBER"/json)
     if [[ "$verify" = *"Not Found"* ]]; then
       echo "版本 $VERSIONNUMBER 未找到..."
       echo "退出..."
@@ -122,6 +122,8 @@ echo "升级 Home Assistant"
 pip3 install --upgrade setuptools wheel -i https://mirrors.aliyun.com/pypi/simple/
 if [ "$DEV" == "true" ]; then
   pip3 install git+https://github.com/home-assistant/home-assistant@dev
+elif [ "$BETA" == "true" ]; then
+  pip3 install --upgrade --pre homeassistant
 else
   pip3 install --upgrade homeassistant=="$newversion" -i https://mirrors.aliyun.com/pypi/simple/
 fi
