@@ -39,7 +39,6 @@ cd ~/.node-red
 npm install node-red-contrib-home-assistant
 
 echo "设置自动启动"
-cd /home/pi
 sudo wget https://raw.githubusercontent.com/node-red/raspbian-deb-package/master/resources/nodered.service -O /lib/systemd/system/nodered.service
 sudo wget https://raw.githubusercontent.com/node-red/raspbian-deb-package/master/resources/node-red-start -O /usr/bin/node-red-start
 sudo wget https://raw.githubusercontent.com/node-red/raspbian-deb-package/master/resources/node-red-stop -O /usr/bin/node-red-stop
@@ -49,6 +48,8 @@ sudo systemctl enable nodered.service
 
 echo "启动 Node-RED"
 sudo systemctl start nodered.service
+sleep 3
+
 ip_address=$(ifconfig | grep "inet.*broadcast" | grep -v 0.0.0.0 | awk '{print $2}')
 
 echo "安装检查..."
