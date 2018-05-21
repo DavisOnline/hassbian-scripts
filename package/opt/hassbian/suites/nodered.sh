@@ -48,7 +48,7 @@ sudo systemctl enable nodered.service
 
 echo "启动 Node-RED"
 sudo systemctl start nodered.service
-sleep 3
+sleep 2
 
 ip_address=$(ifconfig | grep "inet.*broadcast" | grep -v 0.0.0.0 | awk '{print $2}')
 
