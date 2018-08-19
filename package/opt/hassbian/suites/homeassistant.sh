@@ -27,8 +27,8 @@ echo "进入 Home Assistant 虚拟环境"
 source /srv/homeassistant/bin/activate
 
 echo "安装最新版本 Home Assistant"
-pip3 install setuptools wheel -i https://mirrors.aliyun.com/pypi/simple/
-pip3 install homeassistant -i https://mirrors.aliyun.com/pypi/simple/
+pip3 install setuptools wheel
+pip3 install homeassistant
 
 echo "退出虚拟环境"
 deactivate
@@ -119,13 +119,13 @@ echo "进入 Home Assistant 虚拟环境"
 source /srv/homeassistant/bin/activate
 
 echo "升级 Home Assistant"
-pip3 install --upgrade setuptools wheel -i https://mirrors.aliyun.com/pypi/simple/
+pip3 install --upgrade setuptools wheel
 if [ "$DEV" == "true" ]; then
   pip3 install git+https://github.com/home-assistant/home-assistant@dev
 elif [ "$BETA" == "true" ]; then
   pip3 install --upgrade --pre homeassistant
 else
-  pip3 install --upgrade homeassistant=="$newversion" -i https://mirrors.aliyun.com/pypi/simple/
+  pip3 install --upgrade homeassistant=="$newversion"
 fi
 
 echo "退出虚拟环境"
