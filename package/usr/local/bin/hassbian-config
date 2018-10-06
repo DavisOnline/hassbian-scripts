@@ -17,6 +17,7 @@ function help {
   printf "主命令 [command]:\\n"
   printf "%-8s\\t%s\\n" "  install" "安装软件 [suite]"
   printf "%-8s\\t%s\\n" "  upgrade" "升级软件 [suite]"
+  printf "%-8s\\t%s\\n" "  remove" "卸载软件 [suite]."
   printf "%-8s\\t%s\\n" "  show" "查看可供安装/升级的软件 [suite]"
   printf "%-8s\\t%s\\n" "  log" "显示上次操作log"
   printf "%-8s\\t%s\\n" "  share-log" "生成上次操作的 hastebin 链接"
@@ -103,10 +104,10 @@ function check-permission {
 function raspberry_pi_zero_check {
 ## Start check for Raspberry Pi Zero
 if [ "$FORCE" != "true" ]; then
-  PI_VERSION=$(uname -a | egrep 'armv[0-9]+l' -o)
-  if [ "$PI_VERSION" = "armv6l" ]; then
-    if [[ "$1" =~ ^(mosquitto|homebridge|cloud9|nodered)$ ]]; then
-      echo "树莓派 Zero 无法通过脚本安装此软件..."
+  REVCODE=$(sudo cat /proc/cpuinfo | grep 'Revision' | awk '{print $3}' | sed 's/^ *//g' | sed 's/ *$//g')
+  if [ "$REVCODE" = "90092" ] || [ "$REVCODE" = "90093" ] || [ "$REVCODE" = "0x9000C1" ] || [ "$REVCODE" = "9000c1" ]; then
+    if [[ "$1" =~ ^(mosquitto|cloud9)$ ]]; then
+      echo "此软件无法安装在 Raspberry Pi Zero..."
       exit 0
     fi
   fi
@@ -183,7 +184,7 @@ function install-suite { #This function do checks if we can/want to install.
   return 0
 }
 
-function upgrade-suite { #This function do checks if we can to upgrade.
+function upgrade-suite { #This function do checks if we can upgrade.
   check-permission
   UPGRADE=$(grep "$1"-upgrade-package "$SUITE_INSTALL_DIR/$1".sh) #Checking if suite has upgrade function.
   if [ "$UPGRADE" == "" ]; then
@@ -191,6 +192,17 @@ function upgrade-suite { #This function do checks if we can to upgrade.
     return 0
   fi
   run-suite upgrade "$1" | tee "$LOGFILE" #This is the default run.
+  return 0
+}
+
+function remove-suite { #This function do checks if we can remove.
+  check-permission
+  REMOVABLE=$(grep "$1"-remove-package "$SUITE_INSTALL_DIR/$1".sh) #Checking if suite has remove function.
+  if [ "$REMOVABLE" == "" ]; then
+    printf "Remove function not avaialable for this suite.\\n"
+    return 0
+  fi
+  run-suite remove "$1" | tee "$LOGFILE" #This is the default run.
   return 0
 }
 
@@ -280,6 +292,15 @@ case $COMMAND in
     fi
     if verify-suite "$SUITE"; then
       RUN="upgrade-suite $SUITE"
+    else
+      RUN="echo suite $SUITE doesn't exist."
+    fi
+    shift # past argument
+    shift # past value
+    ;;
+  "remove")
+    if verify-suite "$SUITE"; then
+      RUN="remove-suite $SUITE"
     else
       RUN="echo suite $SUITE doesn't exist."
     fi

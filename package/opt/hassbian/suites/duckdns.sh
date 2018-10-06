@@ -71,12 +71,13 @@ chmod 700 duck.sh
 
 echo "Creating cron job..."
 (crontab -l ; echo "*/5 * * * * /home/homeassistant/duckdns/duck.sh >/dev/null 2>&1")| crontab -
-if [ "$SSL_RESPONSE" == "y" ] || [ "$SSL_RESPONSE" == "Y" ]; then
-(crontab -l ; echo "0 1 1 * * /home/homeassistant/dehydrated/dehydrated -c")| crontab -
-fi
 
-echo "Changing to root user..."
 EOF
+
+if [ "$SSL_RESPONSE" == "y" ] || [ "$SSL_RESPONSE" == "Y" ]; then
+  cp /opt/hassbian/suites/files/dehydrated_cron /etc/cron.daily/dehydrated
+  chmod +x /etc/cron.daily/dehydrated
+fi
 
 echo "Restarting cron service..."
 sudo systemctl restart cron.service
@@ -109,6 +110,20 @@ else
   return 1
 fi
 return 0
+}
+
+function duckdns-remove-package {
+  echo "Removing certificates if installed."
+  rm -R /home/homeassistant/dehydrated >/dev/null 2>&1
+
+  echo "Removing cron jobs"
+  rm /etc/cron.daily/dehydrated >/dev/null 2>&1
+  crontab -u homeassistant -l | grep -v 'duck.sh'  | crontab -u homeassistant -
+
+  echo
+  echo -e "\\e[32mRemoval done..\\e[0m"
+  echo
+  return 0
 }
 
 [[ "$_" == "$0" ]] && echo "hassbian-config helper script; do not run directly, use hassbian-config instead"

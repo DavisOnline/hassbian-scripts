@@ -1,6 +1,5 @@
 ## Hassbian-scripts 中文版
-此为 Mossbian 镜像所自带的脚本。
-
+此为 Mossbian 镜像所自带的脚本。 
 
 ## 软件列表
 以下为脚本所附软件列表，可进入查阅具体文档。
@@ -11,7 +10,6 @@
   * [Duck DNS](/docs/duckdns.md)
   * [Hassbian](/docs/hassbian.md)
   * [Home Assistant](/docs/homeassistant.md)
-  * [Homebridge](/docs/homebridge.md)
   * [HUE](/docs/hue.md)
   * [LibCEC](/docs/libcec.md)
   * [MariaDB](/docs/mariadb.md)
@@ -26,4 +24,9 @@
 
 ***
 
+## Raspbian Jessie
 
+使用 Debian Jessie 请修改 `/etc/apt/sources.list` 中的注释
+
+<!--- Links --->
+[changelog]: https://github.com/cxlwill/hassbian-scripts/releases

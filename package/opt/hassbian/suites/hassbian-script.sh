@@ -13,7 +13,6 @@ function hassbian-script-show-copyright-info {
 }
 
 function hassbian-script-upgrade-package {
-
 if [ "$DEV" == "true"  ]; then
   echo "此脚本将从 Github 下载开发版 hassbian-scripts"
   echo "以帮助你进行 Hassbian 的相关开发"
@@ -21,7 +20,7 @@ if [ "$DEV" == "true"  ]; then
   echo -n "确定继续? [N/y] : "
   read -r RESPONSE
   if [ "$RESPONSE" == "y" ] || [ "$RESPONSE" == "Y" ]; then
-    RESPONSE="Y"
+    devbranch="-dev"
   else
     echo "退出..."
     return 0
@@ -71,10 +70,9 @@ else
   else
     apt install -y /tmp/"$HASSBIAN_PACKAGE" --reinstall
   fi
-  echo "Cleanup"
+  echo "清理文件"
   rm "$HASSBIAN_PACKAGE"
 fi
-
 systemctl daemon-reload
 
 echo

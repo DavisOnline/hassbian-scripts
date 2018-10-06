@@ -132,6 +132,34 @@ echo "退出虚拟环境"
 deactivate
 EOF
 
+if [ "$FORCE" != "true"  ]; then
+  current_version=$(cat /home/homeassistant/.homeassistant/.HA_VERSION)
+  config_check=$(sudo -u homeassistant -H /bin/bash << EOF
+  source /srv/homeassistant/bin/activate
+  hass --script check_config -c /home/homeassistant/.homeassistant/
+EOF
+  )
+  config_check_lines=$(echo "$config_check" | wc -l)
+  if (( config_check_lines > 1 ));then
+    if [ "$ACCEPT" != "true" ]; then
+      echo -n "Config check failed for new version, do you want to revert? [Y/n] : "
+      read -r RESPONSE
+      if [ ! "$RESPONSE" ]; then
+        RESPONSE="Y"
+      fi
+    else
+      RESPONSE="Y"
+    fi
+    if [ "$RESPONSE" == "y" ] || [ "$RESPONSE" == "Y" ]; then
+      sudo -u homeassistant -H /bin/bash << EOF
+      source /srv/homeassistant/bin/activate
+      pip3 install --upgrade homeassistant=="$current_version"
+      deactivate
+EOF
+    fi
+  fi
+fi
+
 echo "重启 Home Assistant"
 systemctl restart home-assistant@homeassistant.service
 
@@ -140,8 +168,8 @@ validation=$(pgrep -x hass)
 if [ ! -z "${validation}" ]; then
   echo
   echo -e "\\e[32m更新完成..\\e[0m"
-  echo "更新后初次启动需要安装依赖包，请稍等片刻再打开网页"
-  echo -e "\\e[0m对此脚本有任何疑问或建议, 欢迎加QQ群515348788讨论"
+  echo "注意更新后需要一定时间启动"
+  echo
 else
   echo
   echo -e "\\e[31m更新失败..."
