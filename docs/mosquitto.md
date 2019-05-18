@@ -1,13 +1,15 @@
 ## Description
 This script installs the MQTT Mosquitto server. Repository from the Mosquitto project is added to package system and the official packages for Debian are installed. Additionally, this script helps you create your first MQTT user that can be used with Home Assistant.
 
+*This suite can't be installed on Raspberry Pi Zero*  
+
 ## Installation
 ```
 $ sudo hassbian-config install mosquitto
 ```
 
 ## Upgrade
-No script avaiable, maybe you could write one?  
+No script available, maybe you could write one?  
 If so, add an PR here when you are done:  
 [homeassistant/hassbian-scripts](https://github.com/home-assistant/hassbian-scripts/pulls)
 

@@ -1,20 +1,17 @@
 #!/bin/bash
 function homeassistant-show-short-info {
-    echo "Home Assistant install script for Hassbian"
+  echo "Home Assistant install script for Hassbian."
 }
 
 function homeassistant-show-long-info {
-    echo "Installs the base homeassistant package onto this system."
+  echo "Installs the base homeassistant package onto this system."
 }
 
 function homeassistant-show-copyright-info {
-    echo "Copyright(c) 2017 Fredrik Lindqvist <https://github.com/Landrash>"
+  echo "Copyright(c) 2017 Fredrik Lindqvist <https://github.com/Landrash>."
 }
 
 function homeassistant-install-package {
-homeassistant-show-short-info
-homeassistant-show-copyright-info
-
 echo "Changing to the homeassistant user"
 sudo -u homeassistant -H /bin/bash << EOF
 
@@ -45,38 +42,63 @@ systemctl start home-assistant@homeassistant.service
 
 ip_address=$(ifconfig | grep "inet.*broadcast" | grep -v 0.0.0.0 | awk '{print $2}')
 
-echo
-echo "Installation done."
-echo
-echo "Your Home Assistant installation is running at $ip_address:8123 or if prefered http://hassbian.local:8123"
-echo
-echo "To continue have a look at https://home-assistant.io/getting-started/configuration/"
-echo
-echo "If this script failed then this Raspberry Pi most likely did not have a fully functioning internet connection."
-echo "If you have issues with this script, please say something in the #devs_hassbian channel on Discord."
-echo
+echo "Checking the installation..."
+validation=$(pgrep -x hass)
+if [ ! -z "${validation}" ]; then
+  echo
+  echo -e "\\e[32mInstallation done..\\e[0m"
+  echo "Your Home Assistant installation is running at $ip_address:8123 or if preferred http://hassbian.local:8123"
+  echo "To continue have a look at https://home-assistant.io/getting-started/configuration/"
+  echo
+  echo
+else
+  echo
+  echo -e "\\e[31mInstallation failed..."
+  echo
+  return 1
+fi
 return 0
 }
 
 function homeassistant-upgrade-package {
-homeassistant-show-short-info
-homeassistant-show-copyright-info
-
-echo "Checking current version"
-pypiversion=$(curl -s https://pypi.python.org/pypi/homeassistant/json | grep '"version":' | awk -F'"' '{print $4}')
-
-sudo -u homeassistant -H /bin/bash << EOF | grep Version|awk '{print $2'}|while read version; do if [[ ${pypiversion} == ${version} ]]; then echo "You already have the latest version: $version";exit 1;fi;done
-source /srv/homeassistant/bin/activate
-pip3 show homeassistant
+if [ "$DEV" == "true"  ]; then
+  echo "This script downloads Home Assistant directly from the dev branch on Github."
+  echo "you can use this to be on the 'bleeding edge of the development of Home Assistant.'"
+  echo "This is not recommended for daily use."
+  echo -n "Are you really sure you want to continue? [N/y] : "
+  read -r RESPONSE
+  if [ "$RESPONSE" == "y" ] || [ "$RESPONSE" == "Y" ]; then
+    RESPONSE="Y"
+  else
+    echo "Exiting..."
+    return 0
+  fi
+else
+  echo "Checking current version"
+  if [ "$BETA" == "true"  ]; then
+  newversion=$(curl -s https://api.github.com/repos/home-assistant/home-assistant/releases | grep tag_name | head -1 | awk -F'"' '{print $4}')
+  elif [ ! -z "${VERSIONNUMBER}" ]; then
+    verify=$(curl -s https://pypi.org/pypi/homeassistant/"$VERSIONNUMBER"/json)
+    if [[ "$verify" = *"Not Found"* ]]; then
+      echo "Version $VERSIONNUMBER not found..."
+      echo "Exiting..."
+      return 0
+    else
+      newversion="$VERSIONNUMBER"
+    fi
+  else
+    newversion=$(curl -s https://api.github.com/repos/home-assistant/home-assistant/releases/latest | grep tag_name | awk -F'"' '{print $4}')
+  fi
+  sudo -u homeassistant -H /bin/bash << EOF | grep Version | awk '{print $2}'|while read -r version; do if [[ "${newversion}" == "${version}" ]]; then echo "You already have version: $version";exit 1;fi;done
+  source /srv/homeassistant/bin/activate
+  pip3 show homeassistant
 EOF
 
-if [[ $? == 1 ]]; then
-        echo "Stopping upgrade"
-        exit 1
+  if [[ $? == 1 ]]; then
+    echo "Stopping upgrade"
+    exit 1
+  fi
 fi
-
-echo "Stopping Home Assistant"
-systemctl stop home-assistant@homeassistant.service
 
 echo "Changing to the homeassistant user"
 sudo -u homeassistant -H /bin/bash << EOF
@@ -84,25 +106,37 @@ sudo -u homeassistant -H /bin/bash << EOF
 echo "Changing to Home Assistant venv"
 source /srv/homeassistant/bin/activate
 
-echo "Installing latest version of Home Assistant"
+echo "Upgrading Home Assistant"
 pip3 install --upgrade setuptools wheel
-pip3 install --upgrade homeassistant
+if [ "$DEV" == "true" ]; then
+  pip3 install git+https://github.com/home-assistant/home-assistant@dev
+elif [ "$BETA" == "true" ]; then
+  pip3 install --upgrade --pre homeassistant
+else
+  pip3 install --upgrade homeassistant=="$newversion"
+fi
 
 echo "Deactivating virtualenv"
 deactivate
 EOF
 
 echo "Restarting Home Assistant"
-systemctl start home-assistant@homeassistant.service
+systemctl restart home-assistant@homeassistant.service
 
-echo
-echo "Uppgrade complete."
-echo
-echo "Note that it may take some time to start up after an upgrade."
-echo
-echo "If you have issues with this script, please say something in the #devs_hassbian channel on Discord."
-echo
+echo "Checking the installation..."
+validation=$(pgrep -x hass)
+if [ ! -z "${validation}" ]; then
+  echo
+  echo -e "\\e[32mUpgrade complete..\\e[0m"
+  echo "Note that it may take some time to start up after an upgrade."
+  echo
+else
+  echo
+  echo -e "\\e[31mUpgrade failed..."
+  echo
+  return 1
+fi
 return 0
 }
 
-[[ $_ == $0 ]] && echo "hassbian-config helper script; do not run directly, use hassbian-config instead"
+[[ "$_" == "$0" ]] && echo "hassbian-config helper script; do not run directly, use hassbian-config instead"
